@@ -278,6 +278,25 @@ header h1{margin:0;font-size:20px;font-weight:900}
 .mkdishes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:4px}
 .mkdishes span{background:#e8f6ee;color:var(--green);border-radius:999px;padding:2px 10px;font-weight:900}
 .mkdishes span.none{background:#fde8e6;color:var(--red)}
+/* combo, events, cat */
+#comboStat{background:#e67e22!important;animation:pop .3s}
+#comboStat b{color:#fff3a0}
+#evBanner{margin-top:8px;display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;border-radius:14px;padding:6px 12px;border:3px solid var(--gold);animation:pop .35s}
+#evBanner>b{font-size:30px;line-height:1}
+#evName{font-weight:900;font-size:16px}
+#evDesc{opacity:.9;font-weight:700}
+.evbar{flex:1;max-width:110px;height:8px;background:rgba(255,255,255,.2);border-radius:9px;overflow:hidden;margin-inline-start:auto}
+.evbar i{display:block;height:100%;width:100%;background:var(--gold)}
+body.blackout #app>.sect{filter:brightness(.5) saturate(.7);transition:filter .4s}
+body.blackout .stove .fire{opacity:.15!important}
+.board{position:relative}
+#cat{position:absolute;top:-34px;left:6px;font-size:46px;line-height:1;cursor:pointer;z-index:6;padding:4px;
+  animation:catIn .6s ease-out,catWig .45s .6s infinite alternate;filter:drop-shadow(0 3px 2px rgba(0,0,0,.35))}
+#cat small{position:absolute;top:-16px;left:0;font-size:11px;font-weight:900;background:#fff;color:var(--ink);border-radius:10px;padding:0 6px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+#cat.run{animation:catOut .6s forwards}
+@keyframes catIn{from{transform:translateX(-170px)}}
+@keyframes catWig{to{transform:rotate(-8deg) translateY(-3px)}}
+@keyframes catOut{to{transform:translateX(-280px);opacity:0}}
 /* ---- phone: whole kitchen fits on one screen ---- */
 button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
 @media (max-width:600px){
@@ -331,6 +350,12 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
   .stars{font-size:34px}
   .sumtbl{font-size:13px}
   #toast{top:auto;bottom:18px;font-size:13px}
+  #evBanner{margin-top:6px;padding:4px 8px;gap:6px;border-width:2px;border-radius:10px}
+  #evBanner>b{font-size:22px}
+  #evName{font-size:13px}
+  #evDesc{font-size:11px}
+  .evbar{max-width:60px;height:6px}
+  #cat{font-size:38px;top:-28px}
 }
 </style>
 </head>
@@ -344,9 +369,11 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
       <span class="stat">⏰ <b id="clock">09:00</b></span>
       <span class="stat">💰 <b id="money">0</b> / <span id="target">100</span> <span class="goal"><i id="goalBar"></i></span></span>
       <span class="stat" id="hearts">❤️❤️❤️</span>
+      <span class="stat hidden" id="comboStat"></span>
       <span class="stat">🏦 <b id="bank">0</b></span>
     </div>
   </header>
+  <div id="evBanner" class="hidden"><b id="evIcon"></b><div><div id="evName"></div><small id="evDesc"></small></div><div class="evbar"><i id="evBar"></i></div></div>
 
   <div class="sect">
     <h2>الكليان 🧍 (كليكي على الكليان باش تعطيه الماكلة)</h2>
@@ -443,6 +470,9 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     🧺 كليكي على العناصر باش تحطهم فالطبلة، ومن بعد كليكي على كانون خاوي باش تطيب.<br>
     ✋ ملي توجد الماكلة، <span data-g="هزها وعطيها|هزيها وعطيها">هزها وعطيها</span> للكليان اللي طلبها.<br>
     🛒 السلعة كتشريها من السوق بالفلوس ديالك، وكل طبسيل كياكل منها. إلا تقاضا شي عنصر، الكليان اللي طلب داك الماكلة كيتقلق ويمشي.<br>
+    🔥 كومبو: 3 كليان مورا بعضياتهم بلا غلط = الفلوس ×1.5، و5 = دوبل!<br>
+    🐈 إلا دخل القط للكوزينة، <span data-g="كليكي|كليكي">كليكي</span> عليه دغيا قبل ما يسرق ليك السلعة.<br>
+    🎲 رد بالك من المفاجآت: الضو يمشي ⚡، عرس فالدرب 🎉، ولا الشتا 🌧️.<br>
     💨 <span data-g="رد|ردي">رد</span> بالك: الماكلة كتحرق إلا خليتيها فالكانون بزاف!<br>
     ⏰ النهار من 9:00 حتى 18:00. <span data-g="وصل|وصلي">وصل</span> للهدف باش تاخد النجوم ⭐. فـ18:00 كيتسد الباب، ولكن النهار ما كيساليش حتى <span data-g="تعطي|تعطيي">تعطي</span> لآخر كليان الطلب ديالو.<br>
     ❤️ إلا مشاو ٣ ديال الكليان معصبين، كتسد بكري داك النهار.</p>
@@ -967,6 +997,15 @@ const sfx={
   bad:()=>beep(160,.3,'sawtooth',.12),
   burn:()=>beep(110,.4,'square',.08),
   fanfare:()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle',.12),i*130)),
+  meow:(angry)=>{try{
+    if(!AC)return;
+    const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime,d=angry?.32:.45;
+    o.type='triangle';
+    o.frequency.setValueAtTime(angry?900:550,t);o.frequency.linearRampToValueAtTime(angry?1300:950,t+d*.35);o.frequency.linearRampToValueAtTime(angry?700:480,t+d);
+    g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(.14,t+.05);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g);g.connect(AUD.sfxBus);o.start(t);o.stop(t+d+.02);
+  }catch(e){}},
+  combo:n=>[660,880,1100,1320].slice(0,Math.min(4,n-1)).forEach((f,i)=>setTimeout(()=>beep(f,.1,'square',.07),i*70)),
 };
 
 /* ================= STORAGE ================= */
@@ -1000,9 +1039,15 @@ function msg(icon,title,html,btn,cb){
 /* ================= KITCHEN SETUP ================= */
 function newDayState(){
   ensureStock();
-  S={money:0,tips:0,cost:0,hearts:3,served:0,angry:0,burnt:0,wrong:0,cancel:0,dishes:{},
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  S={money:0,tips:0,bonus:0,cost:0,hearts:3,served:0,angry:0,burnt:0,wrong:0,cancel:0,dishes:{},
      board:[],hand:null,time:0,spawnT:1.5,customers:[null,null,null],
-     stoves:[{st:'empty'},{st:'empty'}]};
+     stoves:[{st:'empty'},{st:'empty'}],
+     combo:0,bestCombo:0,
+     cat:null,catShoo:0,catStole:0,
+     catAt:Math.random()<.8?rnd(12,70):-1, cat2At:G.rdays[G.cur]>=2&&Math.random()<.5?rnd(72,88):0,
+     ev:null, evAt:Math.random()<.7?rnd(25,62):-1};
+  if(typeof resetFun==='function'){resetFun();renderCombo()}
   buildIngs();buildBook();renderAll();
 }
 /* ---- stock & market ---- */
@@ -1064,6 +1109,78 @@ $('#mkFill').onclick=()=>{
   G.bank-=c;keys.forEach(k=>{G.stock[k]=Math.max(stk(k),10)});save();sfx.fanfare();renderMarket();
 };
 $('#mkDone').onclick=()=>mktBack();
+
+/* ---- fun: combo, thieving cat, random events ---- */
+const comboMult=()=>S.combo>=5?2:S.combo>=3?1.5:1;
+function renderCombo(){
+  const el=$('#comboStat');
+  el.classList.toggle('hidden',S.combo<2);
+  el.innerHTML=`🔥 ${S.combo}${comboMult()>1?` <b>×${comboMult()}</b>`:''}`;
+}
+function breakCombo(){
+  if(S.combo>=3)toast(`💔 تقطع الكومبو ديال ${S.combo}!`);
+  S.combo=0;renderCombo();
+}
+
+const EVENTS={
+  power:  {icon:'⚡',name:'الضو مشا!',desc:'الكوانين ولاو كيطيبو بشوية…',dur:16},
+  wedding:{icon:'🎉',name:'عرس فالدرب!',desc:'كليان بزاف وكيخلصو +50% 💃',dur:16},
+  rain:   {icon:'🌧️',name:'الشتا كتصب!',desc:'',dur:18},
+};
+const evIs=id=>S.ev&&S.ev.id===id;
+function startEvent(id){
+  const e=EVENTS[id];S.ev={id,t:0,dur:e.dur};
+  let desc=e.desc;
+  if(id==='rain'){const ok=menu().filter(canMake);S.ev.dish=pick(ok.length?ok:menu());
+    desc=`كلشي باغي ${R[S.ev.dish].icon} ${R[S.ev.dish].name} سخونة — البقشيش دوبل!`}
+  if(id==='wedding')S.spawnT=.4;
+  document.body.classList.toggle('blackout',id==='power');
+  $('#evIcon').textContent=e.icon;$('#evName').textContent=e.name;$('#evDesc').textContent=desc;
+  $('#evBanner').classList.remove('hidden');
+  id==='power'?sfx.burn():sfx.fanfare();
+  toast(`${e.icon} ${e.name}`);
+}
+function updateEvent(dt){
+  S.ev.t+=dt;$('#evBar').style.width=Math.max(0,100-S.ev.t/S.ev.dur*100)+'%';
+  if(S.ev.t>=S.ev.dur){
+    const id=S.ev.id;endEvent();
+    toast(id==='power'?'💡 رجع الضو!':id==='wedding'?'🎉 سالا العرس، الله يتمم بخير!':'☀️ وقفات الشتا');
+  }
+}
+function endEvent(){S.ev=null;document.body.classList.remove('blackout');$('#evBanner').classList.add('hidden')}
+
+function spawnCat(){
+  const board=document.querySelector('.board');if(!board)return;
+  removeCat();
+  const c=document.createElement('div');c.id='cat';c.innerHTML='🐈<small>ميااو</small>';
+  c.addEventListener('click',e=>{e.stopPropagation();if(!running||!S.cat)return;
+    S.cat=null;S.catShoo++;sfx.meow(true);toast(pick(['سير فحالك يا المش! 😾','بششش! هرب القط 🐈💨','ماشي اليوم أ المش 😼']));
+    c.classList.add('run');setTimeout(()=>c.remove(),600)});
+  board.appendChild(c);
+  S.cat={t:0,life:Math.max(3.2,5-diff()*.15)};
+  sfx.meow();toast(`🐈 مش دخل للكوزينة! ${g('كليكي','كليكي')} عليه قبل ما يسرق`);
+}
+function removeCat(){const c=$('#cat');if(c)c.remove()}
+function catSteal(){
+  S.cat=null;S.catStole++;
+  let what='';
+  const bi=S.board.includes('fish')?S.board.indexOf('fish'):S.board.length?Math.floor(Math.random()*S.board.length):-1;
+  if(bi>=0){ // grabs something from the cutting board (it was already counted from the stock)
+    const k=S.board.splice(bi,1)[0];G.stock[k]=Math.max(0,stk(k)-1);what=ING[k][0]+' '+ING[k][1];renderBoard();
+  }else{
+    const si=S.stoves.findIndex(s=>s.st==='ready');
+    if(si>=0&&Math.random()<.5){what=R[S.stoves[si].dish].icon+' '+R[S.stoves[si].dish].name;S.stoves[si]={st:'empty'};renderStoves(true);breakCombo()}
+    else{
+      const ks=menuIngs().filter(k=>stk(k)>0);
+      const k=ks.includes('fish')?'fish':ks.length?pick(ks):null;
+      if(k){G.stock[k]=stk(k)-1;what=ING[k][0]+' '+ING[k][1];renderStock()}
+    }
+  }
+  save();sfx.meow(true);
+  toast(what?`😹 القط هرب بـ${what}!`:'😹 القط ما لقا والو وهرب');
+  const c=$('#cat');if(c){c.classList.add('run');setTimeout(()=>c.remove(),600)}
+}
+function resetFun(){endEvent();removeCat()}
 function buildBook(){
   $('#bookTitle').textContent=`منيو المطعم ديال ${REGIONS[G.cur].city} 📖`;
   $('#book').innerHTML=menu().map(id=>{const r=R[id];
@@ -1186,17 +1303,25 @@ $('#customers').addEventListener('click',e=>{
   if(!c)return;
   if(!S.hand&&!canServe(c)){
     // out of ingredients: cancel the order, the customer leaves upset
-    S.customers[i]=null;S.cancel++;sfx.bad();say(c.vid,'angry',true);
+    S.customers[i]=null;S.cancel++;sfx.bad();say(c.vid,'angry',true);breakCombo();
     toast(`🚫 ${c.name}: "ما كاينش ${R[c.dish].name}؟! صافي مشيت" 😤 الطلبية تلغات`);
     renderCustomers(true);return;
   }
   if(!S.hand){toast(`${c.name} باغي ${R[c.dish].name} ${R[c.dish].icon}`);return}
-  if(S.hand!==c.dish){toast(`${c.name}: ماشي هادا اللي طلبت! 😠 (باغي ${R[c.dish].icon} ${R[c.dish].name})`);sfx.bad();say(c.vid,'wrong',true);S.wrong++;c.pat-=c.max*.25;return}
-  say(c.vid,'thanks',true);toast(`${c.name}: شكرا! ${R[c.dish].icon} 😋`);
-  const r=R[c.dish], tip=Math.round(c.pat/c.max*10);
-  S.money+=r.price+tip;S.tips+=tip;S.served++;S.dishes[c.dish]=(S.dishes[c.dish]||0)+1;
+  if(S.hand!==c.dish){toast(`${c.name}: ماشي هادا اللي طلبت! 😠 (باغي ${R[c.dish].icon} ${R[c.dish].name})`);sfx.bad();say(c.vid,'wrong',true);S.wrong++;c.pat-=c.max*.25;breakCombo();return}
+  say(c.vid,'thanks',true);
+  const r=R[c.dish], tip=Math.round(c.pat/c.max*10)*(evIs('rain')?2:1);
+  S.combo++;S.bestCombo=Math.max(S.bestCombo,S.combo);
+  const base=r.price*(evIs('wedding')?1.5:1), mult=comboMult(), total=Math.round((base+tip)*mult);
+  S.money+=total;S.tips+=tip;S.bonus+=total-r.price-tip;S.served++;S.dishes[c.dish]=(S.dishes[c.dish]||0)+1;
   S.hand=null;S.customers[i]=null;
-  floatText(`+${r.price+tip} 💰`,el);sfx.coin();
+  floatText(`+${total} 💰${mult>1?' 🔥':''}`,el);sfx.coin();
+  if(S.combo===3)toast('🔥 كومبو ×3! الفلوس ×1.5');
+  else if(S.combo===5)toast(`🔥🔥 ${g('نتا','نتي')} واعر! كومبو ×5 — الفلوس دوبل!`);
+  else if(S.combo>5&&S.combo%5===0)toast(`👑 كومبو ×${S.combo}! ما كاينش بحالك`);
+  else toast(`${c.name}: شكرا! ${R[c.dish].icon} 😋`);
+  if(S.combo>=2)setTimeout(()=>sfx.combo(S.combo),180);
+  renderCombo();
   renderStats();renderHand();renderCustomers(true);
 });
 
@@ -1222,7 +1347,7 @@ function spawn(){
   const pool=PEOPLE.filter(p=>!busy.includes(p[2]));
   // customers mostly order what you can still cook, but sometimes ask for something you ran out of
   const ok=menu().filter(canMake);
-  const [face,name,vid,line,suf]=pick(pool.length?pool:PEOPLE), id=pick(ok.length&&Math.random()<.8?ok:menu()), r=R[id];
+  const [face,name,vid,line,suf]=pick(pool.length?pool:PEOPLE), r0=evIs('rain')?S.ev.dish:pick(ok.length&&Math.random()<.8?ok:menu()), id=r0, r=R[id];
   const max=Math.max(22,50-diff()*2.5)+r.time*2;
   S.customers[pick(free)]={face,name,vid,dish:id,pat:max,max,line,suf};
   beep(520,.08,'triangle',.08);
@@ -1243,21 +1368,26 @@ function tick(now){
     if(!S.closing){S.closing=true;toast(`🔒 سدينا الباب! ${g('كمل','كملي')} الكليان اللي بقاو`)}
     clk.textContent='18:00 🔒';
   }
-  S.spawnT-=dt;
+  // thieving cat & random events
+  if(S.catAt>0&&S.time>=S.catAt&&!S.cat&&S.time<DAY_LEN){S.catAt=S.cat2At||-1;S.cat2At=0;spawnCat()}
+  if(S.cat){S.cat.t+=dt;if(S.cat.t>=S.cat.life)catSteal()}
+  if(S.evAt>0&&S.time>=S.evAt&&!S.ev&&S.time<DAY_LEN-12){S.evAt=-1;startEvent(pick(Object.keys(EVENTS)))}
+  if(S.ev)updateEvent(dt);
+  S.spawnT-=dt*(evIs('wedding')?3:1);
   if(S.spawnT<=0&&DAY_LEN-S.time>8){spawn();S.spawnT=Math.max(3.2,9.5-diff()*.5)*(0.8+Math.random()*.4)}
   if(!running)return; // tutorial opened
   S.customers.forEach((c,i)=>{
     if(!c)return;
     c.pat-=dt;
     if(c.pat<=0){
-      S.customers[i]=null;S.hearts--;S.angry++;sfx.bad();say(c.vid,'angry',true);
+      S.customers[i]=null;S.hearts--;S.angry++;sfx.bad();say(c.vid,'angry',true);breakCombo();
       toast(`${c.name} مشا معصب 😤`);renderStats();renderCustomers(true);
     }
   });
   if(S.hearts<=0){endDay(true);return}
   S.stoves.forEach((s,i)=>{
-    if(s.st==='cooking'){s.t+=dt;if(s.t>=R[s.dish].time){S.stoves[i]={st:'ready',dish:s.dish,t:0};sfx.ready()}}
-    else if(s.st==='ready'){s.t+=dt;if(s.t>=BURN){S.stoves[i]={st:'burnt'};S.burnt++;sfx.burn();toast('أويلي! الماكلة تحرقات 🔥')}}
+    if(s.st==='cooking'){s.t+=dt*(evIs('power')?.45:1);if(s.t>=R[s.dish].time){S.stoves[i]={st:'ready',dish:s.dish,t:0};sfx.ready()}}
+    else if(s.st==='ready'){s.t+=dt;if(s.t>=BURN){S.stoves[i]={st:'burnt'};S.burnt++;sfx.burn();toast('أويلي! الماكلة تحرقات 🔥');breakCombo()}}
   });
   renderCustomers();renderStoves();
   if(running)requestAnimationFrame(tick);
@@ -1365,13 +1495,16 @@ function summaryRows(net,tg){
     <tr><td>💨 طباسل تحرقو</td><td>${S.burnt}</td></tr>
     <tr><td>❌ غلطات فالطلبات</td><td>${S.wrong}</td></tr>
     ${S.cancel?`<tr><td>🚫 طلبيات تلغات (السلعة تقاضات)</td><td>${S.cancel}</td></tr>`:''}
-    <tr><td>💵 المدخول</td><td class="pos">+${S.money-S.tips}</td></tr>
+    ${S.bestCombo>=2?`<tr><td>🔥 أحسن كومبو</td><td>×${S.bestCombo}</td></tr>`:''}
+    ${S.catShoo||S.catStole?`<tr><td>🐈 القط: هربتيه / سرق</td><td>${S.catShoo} / ${S.catStole}</td></tr>`:''}
+    <tr><td>💵 المدخول</td><td class="pos">+${S.money-S.tips-S.bonus}</td></tr>
     <tr><td>🪙 البقشيش</td><td class="pos">+${S.tips}</td></tr>
+    ${S.bonus?`<tr><td>🔥 بونوس (كومبو والأحداث)</td><td class="pos">+${S.bonus}</td></tr>`:''}
     <tr><td>🧺 السلعة اللي تستعملات</td><td class="neg">-${S.cost}</td></tr>
     <tr class="total"><td>💰 الربح الصافي</td><td class="${net>=tg?'pos':'neg'}">${net} / ${tg}</td></tr>`;
 }
 function endDay(closed){
-  running=false;stopVoices();setAudioMode('region');
+  running=false;stopVoices();setAudioMode('region');resetFun();
   const net=S.money-S.cost, tg=target();
   const stars=closed?0:net>=tg*2?3:net>=tg*1.5?2:net>=tg?1:0;
   const dayN=G.rdays[G.cur]+1;
@@ -1394,7 +1527,7 @@ function endDay(closed){
 /* ================= MENU & CHARACTER ================= */
 let draft={gender:'f',avatar:AVATARS.f[0]};
 function showMenu(){
-  running=false;setAudioMode('menu');
+  running=false;setAudioMode('menu');resetFun();
   const sv=loadSave()||(G&&G.name?G:null), rec=getRec();
   $('#contBtn').classList.toggle('hidden',!sv);
   $('#chefCard').classList.toggle('hidden',!sv);
