@@ -256,6 +256,28 @@ header h1{margin:0;font-size:20px;font-weight:900}
   header h1{font-size:17px}
   .avatars{grid-template-columns:repeat(3,1fr)}
 }
+/* stock badges & market */
+.ing{position:relative}
+.ing .cnt{position:absolute;top:2px;left:3px;font-style:normal;font-size:11px;font-weight:900;background:var(--teal);color:#fff;border-radius:999px;min-width:18px;padding:0 4px;line-height:16px}
+.ing.low .cnt{background:#e67e22}
+.ing.out{opacity:.4;filter:grayscale(1)}
+.ing.out .cnt{background:var(--red)}
+.cust .nos{display:none;margin-top:4px;font-size:12px;font-weight:900;color:#fff;background:var(--red);border-radius:8px;padding:1px 6px;text-align:center}
+.cust.nostock .nos{display:block}
+.cust.nostock .hint{display:none}
+#mkList{display:flex;flex-direction:column;gap:6px;margin-top:8px;text-align:right}
+.mrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:12px;padding:6px 8px}
+.mrow>b{font-size:30px;line-height:1}
+.mrow .mn{font-weight:900;font-size:15px;line-height:1.3}
+.mrow .mn small{display:block;font-weight:700;font-size:12px;color:var(--muted)}
+.mrow.low .mn span{color:#e67e22}
+.mrow.out{border-color:var(--red)}.mrow.out .mn span{color:var(--red)}
+.btn.mb{background:var(--gold);color:var(--ink);min-width:48px;padding:6px 8px;line-height:1.1}
+.btn.mb small{display:block;font-size:10px}
+#mktScr .btns{position:sticky;bottom:-20px;background:var(--card);padding:8px 0 4px;margin-bottom:-4px}
+.mkdishes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:4px}
+.mkdishes span{background:#e8f6ee;color:var(--green);border-radius:999px;padding:2px 10px;font-weight:900}
+.mkdishes span.none{background:#fde8e6;color:var(--red)}
 /* ---- phone: whole kitchen fits on one screen ---- */
 button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
 @media (max-width:600px){
@@ -297,6 +319,9 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
   #setBtn{top:8px;bottom:auto;left:8px;width:36px;height:36px;font-size:17px;border-width:2px}
   .overlay,#setScr{padding:8px}
   .panel{padding:14px;border-radius:16px;max-height:96vh;max-height:96dvh}
+  #mktScr .btns{bottom:-14px}
+  .mrow{gap:6px;padding:5px 6px}
+  .mrow>b{font-size:26px}
   .panel h1{font-size:24px}
   .panel .big{font-size:46px}
   .menu h1{font-size:32px}
@@ -417,6 +442,7 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     🆕 أول مرة كيطلب شي كليان ماكلة جديدة، كيبان ليك شرح ديال الوصفة. من بعد كيبقا غير إرشاد صغير تحت الطلب.<br>
     🧺 كليكي على العناصر باش تحطهم فالطبلة، ومن بعد كليكي على كانون خاوي باش تطيب.<br>
     ✋ ملي توجد الماكلة، <span data-g="هزها وعطيها|هزيها وعطيها">هزها وعطيها</span> للكليان اللي طلبها.<br>
+    🛒 السلعة كتشريها من السوق بالفلوس ديالك، وكل طبسيل كياكل منها. إلا تقاضا شي عنصر، الكليان اللي طلب داك الماكلة كيتقلق ويمشي.<br>
     💨 <span data-g="رد|ردي">رد</span> بالك: الماكلة كتحرق إلا خليتيها فالكانون بزاف!<br>
     ⏰ النهار من 9:00 حتى 18:00. <span data-g="وصل|وصلي">وصل</span> للهدف باش تاخد النجوم ⭐. فـ18:00 كيتسد الباب، ولكن النهار ما كيساليش حتى <span data-g="تعطي|تعطيي">تعطي</span> لآخر كليان الطلب ديالو.<br>
     ❤️ إلا مشاو ٣ ديال الكليان معصبين، كتسد بكري داك النهار.</p>
@@ -464,6 +490,7 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     <p id="diTxt"></p>
     <div class="btns">
       <button class="btn go" id="diGo"><span data-g="حل|حلي">حل</span> المطعم! 🔓</button>
+      <button class="btn buy" id="diMkt">🛒 السوق</button>
       <button class="btn ghost" id="diMap">🗺️ الخريطة</button>
     </div>
   </div>
@@ -495,7 +522,25 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     <div class="notice hidden" id="deBuy"></div>
     <div class="btns">
       <button class="btn go" id="deNext">النهار الجاي ☀️</button>
+      <button class="btn buy" id="deMkt">🛒 السوق</button>
       <button class="btn alt" id="deMap">🗺️ الخريطة</button>
+    </div>
+  </div>
+</div>
+
+<!-- market -->
+<div class="overlay hidden" id="mktScr">
+  <div class="panel">
+    <div class="big">🛒</div>
+    <h1>السوق</h1>
+    <div class="stat" style="background:#fdf0d5;display:inline-block;margin:6px 0;font-weight:900">🏦 <b id="mkBank">0</b> درهم</div>
+    <div class="lbl2" style="margin-top:0">كل ماكلة كتاكل من السلعة. إلا تقاضات، الكليان كيتقلق 😤</div>
+    <div id="mkList"></div>
+    <div class="lbl2">شحال تقدر توجد بالسلعة اللي عندك:</div>
+    <div class="mkdishes" id="mkDishes"></div>
+    <div class="btns">
+      <button class="btn alt" id="mkFill"></button>
+      <button class="btn go" id="mkDone">ساليت ✔</button>
     </div>
   </div>
 </div>
@@ -954,16 +999,71 @@ function msg(icon,title,html,btn,cb){
 
 /* ================= KITCHEN SETUP ================= */
 function newDayState(){
-  S={money:0,tips:0,cost:0,hearts:3,served:0,angry:0,burnt:0,wrong:0,dishes:{},
+  ensureStock();
+  S={money:0,tips:0,cost:0,hearts:3,served:0,angry:0,burnt:0,wrong:0,cancel:0,dishes:{},
      board:[],hand:null,time:0,spawnT:1.5,customers:[null,null,null],
      stoves:[{st:'empty'},{st:'empty'}]};
   buildIngs();buildBook();renderAll();
 }
+/* ---- stock & market ---- */
+// unit price of each ingredient: about 30% of a dish's price split over its ingredients
+const ING_PRICE={};
+(()=>{const acc={};Object.values(R).forEach(r=>r.ing.forEach(k=>{(acc[k]=acc[k]||[]).push(r.price*.3/r.ing.length)}));
+  for(const k in acc)ING_PRICE[k]=Math.max(1,Math.round(acc[k].reduce((a,b)=>a+b,0)/acc[k].length))})();
+const menuIngs=(i=G.cur)=>[...new Set(REGIONS[i].dishes.flatMap(d=>R[d].ing))];
+const stk=k=>(G.stock&&G.stock[k])||0;
+const canMake=id=>R[id].ing.every(k=>stk(k)>0);
+function giveStock(keys,n){keys.forEach(k=>{G.stock[k]=stk(k)+n})}
+function ensureStock(){
+  if(G.stock)return;
+  G.stock={};for(let i=0;i<G.owned;i++)giveStock(menuIngs(i),6);if(G.name)save();
+}
+// a customer can still be served if the dish can be cooked, is cooking, or is in hand
+function canServe(c){return canMake(c.dish)||S.hand===c.dish||S.stoves.some(s=>(s.st==='cooking'||s.st==='ready')&&s.dish===c.dish)}
+
 function buildIngs(){
   const need=new Set(menu().flatMap(d=>R[d].ing));
   $('#ings').innerHTML=Object.entries(ING).filter(([k])=>need.has(k)).map(([k,[e,n]])=>
-    `<div class="ing" data-k="${k}"><b>${e}</b><small>${n}</small></div>`).join('');
+    `<div class="ing" data-k="${k}"><i class="cnt"></i><b>${e}</b><small>${n}</small></div>`).join('');
+  renderStock();
 }
+function renderStock(){
+  document.querySelectorAll('#ings .ing').forEach(el=>{
+    const k=el.dataset.k, left=stk(k)-(S.board.includes(k)?1:0);
+    el.querySelector('.cnt').textContent=stk(k);
+    el.classList.toggle('low',stk(k)>0&&stk(k)<=2);
+    el.classList.toggle('out',left<=0&&!S.board.includes(k));
+  });
+}
+let mktBack=null;
+function openMarket(back){
+  ensureStock();mktBack=back||dayIntro;renderMarket();showScr('mktScr');
+}
+function renderMarket(){
+  const keys=menuIngs();
+  const fillCost=keys.reduce((a,k)=>a+Math.max(0,10-stk(k))*ING_PRICE[k],0);
+  $('#mkBank').textContent=G.bank;
+  $('#mkFill').textContent=fillCost?`🧺 ${g('عمر','عمري')} كلشي حتى 10 — ${fillCost} درهم`:'🧺 السلعة عامرة ✅';
+  $('#mkFill').disabled=!fillCost||G.bank<fillCost;
+  $('#mkList').innerHTML=keys.map(k=>{const p=ING_PRICE[k],s=stk(k);
+    return `<div class="mrow ${s===0?'out':s<=2?'low':''}"><b>${ING[k][0]}</b>
+      <div class="mn">${ING[k][1]}<small>عندك: <span>${s}</span> · ${p} د للوحدة</small></div>
+      <button class="btn mb" data-k="${k}" data-n="1" ${G.bank<p?'disabled':''}>+1</button>
+      <button class="btn mb" data-k="${k}" data-n="5" ${G.bank<p*5?'disabled':''}>+5<small>${p*5}د</small></button></div>`}).join('');
+  $('#mkDishes').innerHTML=menu().map(d=>{const n=Math.min(...R[d].ing.map(stk));
+    return `<span class="${n?'':'none'}">${R[d].icon} ×${n}</span>`}).join('');
+}
+$('#mkList').addEventListener('click',e=>{
+  const b=e.target.closest('.mb');if(!b||b.disabled)return;
+  const k=b.dataset.k,n=+b.dataset.n,c=ING_PRICE[k]*n;if(G.bank<c)return;
+  G.bank-=c;giveStock([k],n);save();sfx.coin();renderMarket();
+});
+$('#mkFill').onclick=()=>{
+  const keys=menuIngs(),c=keys.reduce((a,k)=>a+Math.max(0,10-stk(k))*ING_PRICE[k],0);
+  if(!c||G.bank<c)return;
+  G.bank-=c;keys.forEach(k=>{G.stock[k]=Math.max(stk(k),10)});save();sfx.fanfare();renderMarket();
+};
+$('#mkDone').onclick=()=>mktBack();
 function buildBook(){
   $('#bookTitle').textContent=`منيو المطعم ديال ${REGIONS[G.cur].city} 📖`;
   $('#book').innerHTML=menu().map(id=>{const r=R[id];
@@ -985,6 +1085,7 @@ function renderBoard(){
   $('#boardItems').innerHTML=S.board.length?S.board.map(k=>`<span data-k="${k}" title="${ING[k][1]}">${ING[k][0]}</span>`).join('')
     :'<small style="font-size:13px;opacity:.85">الطبلة خاوية…</small>';
   document.querySelectorAll('.ing').forEach(el=>el.classList.toggle('on',S.board.includes(el.dataset.k)));
+  renderStock();
 }
 function renderHand(){
   const h=$('#hand');
@@ -1002,6 +1103,7 @@ function renderCustomers(full){
         d.innerHTML=`<div class="face">${c.face}</div><div class="name">${c.name}</div>
           <div class="bubble">${c.line}<span class="dish">${r.icon}</span>${r.name}${c.suf}</div>
           <div class="hint" title="الإرشاد">💡 ${r.ing.map(i=>ING[i][0]).join('')}</div>
+          <div class="nos">❌ تقاضات السلعة<br>${g('كليكي','كليكي')} باش تلغي</div>
           <div class="pat"><i></i></div>`;
       }else d.innerHTML='<div class="empty-txt">🪑 بلاصة خاوية</div>';
       box.appendChild(d);
@@ -1010,6 +1112,7 @@ function renderCustomers(full){
   S.customers.forEach((c,i)=>{
     const d=box.children[i];
     d.classList.toggle('target',!!(c&&S.hand&&S.hand===c.dish));
+    d.classList.toggle('nostock',!!(c&&!canServe(c)));
     if(c){
       const p=Math.max(0,c.pat/c.max), bar=d.querySelector('.pat i');
       bar.style.width=(p*100)+'%';
@@ -1041,7 +1144,9 @@ $('#ings').addEventListener('click',e=>{
   const el=e.target.closest('.ing'); if(!el||!running)return;
   const k=el.dataset.k, idx=S.board.indexOf(k);
   if(idx>=0)S.board.splice(idx,1);
-  else{ if(S.board.length>=5){toast('الطبلة عامرة! (٥ عناصر بزاف)');sfx.bad();return} S.board.push(k)}
+  else{
+    if(stk(k)<=0){toast(`تقاضا ليك ${ING[k][0]} ${ING[k][1]}! ${g('سير','سيري')} للسوق من بعد 🛒`);sfx.bad();return}
+    if(S.board.length>=5){toast('الطبلة عامرة! (٥ عناصر بزاف)');sfx.bad();return} S.board.push(k)}
   sfx.pick();renderBoard();
 });
 $('#boardItems').addEventListener('click',e=>{
@@ -1059,10 +1164,14 @@ document.querySelectorAll('.stove').forEach(el=>el.addEventListener('click',()=>
     const set=[...S.board].sort().join();
     const id=menu().find(d=>[...R[d].ing].sort().join()===set);
     if(!id){toast('هادي ماشي وصفة من المنيو 🤔 '+g('شوف','شوفي')+' الإرشاد 💡');sfx.bad();return}
-    const c=Math.round(R[id].price*.3);
+    // ingredients come out of the stock; their value counts against today's profit
+    const c=R[id].ing.reduce((a,k)=>a+ING_PRICE[k],0);
+    R[id].ing.forEach(k=>{G.stock[k]=Math.max(0,stk(k)-1)});save();
     S.cost+=c;floatText(`-${c} 🧺`,el,'var(--red)');
     S.stoves[i]={st:'cooking',dish:id,t:0};
     S.board=[];sfx.cook();renderBoard();renderStats();
+    const low=R[id].ing.filter(k=>stk(k)===0);
+    if(low.length)toast(`⚠️ تقاضا: ${low.map(k=>ING[k][0]+' '+ING[k][1]).join('، ')}`);
   }else if(s.st==='cooking'){toast(g('صبر','صبري')+' شوية، باقي كيطيب ⏳')}
   else if(s.st==='ready'){
     if(S.hand){toast('يديك عامرين! '+g('عطي','عطيي')+' اللي فيديك لول');return}
@@ -1075,6 +1184,12 @@ $('#customers').addEventListener('click',e=>{
   const el=e.target.closest('.cust'); if(!el||!running)return;
   const i=+el.dataset.i, c=S.customers[i];
   if(!c)return;
+  if(!S.hand&&!canServe(c)){
+    // out of ingredients: cancel the order, the customer leaves upset
+    S.customers[i]=null;S.cancel++;sfx.bad();say(c.vid,'angry',true);
+    toast(`🚫 ${c.name}: "ما كاينش ${R[c.dish].name}؟! صافي مشيت" 😤 الطلبية تلغات`);
+    renderCustomers(true);return;
+  }
   if(!S.hand){toast(`${c.name} باغي ${R[c.dish].name} ${R[c.dish].icon}`);return}
   if(S.hand!==c.dish){toast(`${c.name}: ماشي هادا اللي طلبت! 😠 (باغي ${R[c.dish].icon} ${R[c.dish].name})`);sfx.bad();say(c.vid,'wrong',true);S.wrong++;c.pat-=c.max*.25;return}
   say(c.vid,'thanks',true);toast(`${c.name}: شكرا! ${R[c.dish].icon} 😋`);
@@ -1105,7 +1220,9 @@ function spawn(){
   if(!free.length)return;
   const busy=S.customers.filter(Boolean).map(c=>c.vid);
   const pool=PEOPLE.filter(p=>!busy.includes(p[2]));
-  const [face,name,vid,line,suf]=pick(pool.length?pool:PEOPLE), id=pick(menu()), r=R[id];
+  // customers mostly order what you can still cook, but sometimes ask for something you ran out of
+  const ok=menu().filter(canMake);
+  const [face,name,vid,line,suf]=pick(pool.length?pool:PEOPLE), id=pick(ok.length&&Math.random()<.8?ok:menu()), r=R[id];
   const max=Math.max(22,50-diff()*2.5)+r.time*2;
   S.customers[pick(free)]={face,name,vid,dish:id,pat:max,max,line,suf};
   beep(520,.08,'triangle',.08);
@@ -1201,7 +1318,9 @@ function regInfo(){
 function buy(i){
   const r=REGIONS[i];
   if(G.bank<r.price||i!==G.owned)return;
-  G.bank-=r.price;G.owned++;G.cur=i;save();updRec();sfx.fanfare();
+  ensureStock();
+  const fresh=menuIngs(i).filter(k=>!stk(k));
+  G.bank-=r.price;G.owned++;G.cur=i;giveStock(fresh,4);save();updRec();sfx.fanfare();
   if(G.owned===REGIONS.length){
     msg('👑','مبروك يا '+chefName()+'!',
       `شريتي مطاعم فالـ12 جهة ديال المغرب كاملين، من طنجة حتى للكويرة! 🇲🇦<br>وليتي ${g('أكبر طباخ','أكبر طباخة')} فالبلاد 🏆<br>`+
@@ -1211,18 +1330,26 @@ function buy(i){
   }
   msg('🏪','مطعم جديد فـ'+r.city+'!',
     `مبروك! وليتي ${g('مول','مولات')} مطعم فجهة <b>${r.name}</b> 🎉<br>الماكلة ديال هنا: ${r.dishes.map(d=>R[d].icon+' '+R[d].name).join('، ')}<br>`+
-    `🏦 باقي فالصندوق: ${G.bank} درهم`,'يلاه نخدمو! ▶',()=>dayIntro());
+    `🏦 باقي فالصندوق: ${G.bank} درهم`+(fresh.length?`<br>🎁 المول القديم خلا ليك شوية السلعة: ${fresh.map(k=>ING[k][0]).join(' ')}`:''),'يلاه نخدمو! ▶',()=>dayIntro());
 }
 
 /* ================= DAYS ================= */
 function dayIntro(){
   running=false;
   const r=REGIONS[G.cur], d=G.rdays[G.cur]+1, nw=r.dishes.filter(x=>!G.seen.includes(x));
+  ensureStock();
+  // safety net: never get stuck with no ingredients and no money
+  let gift='';
+  const cheapest=Math.min(...r.dishes.map(x=>R[x].ing.reduce((a,k)=>a+(stk(k)?0:ING_PRICE[k]),0)));
+  if(!r.dishes.some(canMake)&&G.bank<cheapest){giveStock(menuIngs(),3);save();
+    gift=`🎁 الجارة شافتك بلا سلعة وعطاتك شوية من كلشي!<br>`}
   newDayState();
   setAudioMode('region');
+  const low=menuIngs().filter(k=>stk(k)<=2);
   $('#diTitle').textContent=`📍 ${r.city} — النهار ${d}`;
   $('#diTxt').innerHTML=`صباح الخير يا ${chefName()}! ${G.avatar}<br>🎯 الهدف ديال اليوم: <b>${target()} درهم</b> ربح صافي<br>`+
-    `🏦 فالصندوق: <b>${G.bank} درهم</b><br>`+
+    `🏦 فالصندوق: <b>${G.bank} درهم</b><br>`+gift+
+    (low.length?`<span style="color:var(--red);font-weight:900">⚠️ قربات تقاضا: ${low.map(k=>ING[k][0]+stk(k)).join(' ')} — ${g('دوز','دوزي')} للسوق 🛒</span><br>`:'')+
     (nw.length?`🆕 كاين ماكلة جديدة غادي تتعلمها: ${nw.map(x=>R[x].icon).join(' ')}<br>`:'')+
     `🎵 الموسيقى ديال الجهة: <b>${STYLES[REGION_STYLE[G.cur]].name}</b><br>`+
     (G.owned<REGIONS.length?`🛒 المطعم الجاي فـ${REGIONS[G.owned].city}: ${REGIONS[G.owned].price} درهم`:'👑 عندك المطاعم كاملين!');
@@ -1237,9 +1364,10 @@ function summaryRows(net,tg){
     <tr><td>😤 مشاو معصبين</td><td>${S.angry}</td></tr>
     <tr><td>💨 طباسل تحرقو</td><td>${S.burnt}</td></tr>
     <tr><td>❌ غلطات فالطلبات</td><td>${S.wrong}</td></tr>
+    ${S.cancel?`<tr><td>🚫 طلبيات تلغات (السلعة تقاضات)</td><td>${S.cancel}</td></tr>`:''}
     <tr><td>💵 المدخول</td><td class="pos">+${S.money-S.tips}</td></tr>
     <tr><td>🪙 البقشيش</td><td class="pos">+${S.tips}</td></tr>
-    <tr><td>🧺 مصاريف السلعة</td><td class="neg">-${S.cost}</td></tr>
+    <tr><td>🧺 السلعة اللي تستعملات</td><td class="neg">-${S.cost}</td></tr>
     <tr class="total"><td>💰 الربح الصافي</td><td class="${net>=tg?'pos':'neg'}">${net} / ${tg}</td></tr>`;
 }
 function endDay(closed){
@@ -1247,7 +1375,8 @@ function endDay(closed){
   const net=S.money-S.cost, tg=target();
   const stars=closed?0:net>=tg*2?3:net>=tg*1.5?2:net>=tg?1:0;
   const dayN=G.rdays[G.cur]+1;
-  G.bank=Math.max(0,G.bank+net);G.days++;G.rdays[G.cur]++;save();updRec();
+  G.bank+=S.money; // ingredients were already paid at the market
+  G.days++;G.rdays[G.cur]++;save();updRec();
   $('#deTitle').textContent=`سالا النهار ${dayN} فـ${REGIONS[G.cur].city}`;
   $('#deStars').innerHTML=[1,2,3].map(i=>`<span class="${i<=stars?'':'off'}" style="animation-delay:${i*.2}s">⭐</span>`).join('');
   $('#deMsg').textContent=closed?'😬 مشاو ٣ ديال الكليان معصبين، سديتي بكري اليوم!':
@@ -1290,7 +1419,8 @@ $('#nameIn').addEventListener('input',charRender);
 $('#charGo').onclick=()=>{
   const name=$('#nameIn').value.trim();
   if(!name){toast('كتب سميتك عافاك ✍️');$('#nameIn').focus();return}
-  G={name,gender:draft.gender,avatar:draft.avatar,owned:1,cur:0,bank:0,days:0,rdays:REGIONS.map(()=>0),seen:[]};
+  G={name,gender:draft.gender,avatar:draft.avatar,owned:1,cur:0,bank:0,days:0,rdays:REGIONS.map(()=>0),seen:[],stock:null};
+  ensureStock();
   save();updRec();
   msg(G.avatar,`مرحبا بيك يا ${chefName()}!`,
     `${g('بديتي','بديتي')} بمطعم صغير فـ<b>طنجة</b> 🏪<br>${g('خدم مزيان وجمع','خدمي مزيان وجمعي')} الفلوس باش تشري مطاعم فالجهات ديال المغرب، `+
@@ -1306,6 +1436,8 @@ $('#howBtn').onclick=()=>showScr('howScr');
 $('#diGo').onclick=startDay;
 $('#diMap').onclick=()=>showMap(G.cur);
 $('#deNext').onclick=()=>dayIntro();
+$('#diMkt').onclick=()=>openMarket(dayIntro);
+$('#deMkt').onclick=()=>openMarket(dayIntro);
 $('#deMap').onclick=()=>showMap(G.cur);
 document.querySelectorAll('[data-menu]').forEach(b=>b.onclick=showMenu);
 
