@@ -256,6 +256,57 @@ header h1{margin:0;font-size:20px;font-weight:900}
   header h1{font-size:17px}
   .avatars{grid-template-columns:repeat(3,1fr)}
 }
+/* ---- phone: whole kitchen fits on one screen ---- */
+button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
+@media (max-width:600px){
+  #app{padding:6px 6px calc(10px + env(safe-area-inset-bottom))}
+  header{position:sticky;top:4px;z-index:10;padding:4px 6px 4px 46px;border-radius:12px;border-width:2px;box-shadow:0 3px 0 #134a50;gap:4px}
+  header h1{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .stats{gap:3px;font-size:11px;width:100%;justify-content:space-between}
+  .stat{padding:0 6px}
+  .goal{width:34px;height:6px}
+  .sect{margin-top:6px;padding:6px;border-radius:12px}
+  .sect h2{font-size:11px;margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #customers{gap:5px}
+  .cust{min-height:118px;padding:3px;border-radius:10px}
+  .cust .face{font-size:26px}
+  .cust .name{font-size:10px}
+  .bubble{font-size:10px;padding:2px 4px;margin-top:2px;line-height:1.35}
+  .bubble .dish{font-size:22px}
+  .hint{font-size:11px;padding:0 3px}
+  .pat{height:6px;margin-top:3px}
+  #kitchen{grid-template-columns:1fr 1fr;gap:5px}
+  .stove{min-height:92px;padding:4px;border-width:2px;border-radius:10px}
+  .stove .pot{font-size:32px}
+  .stove .lbl{font-size:11px;line-height:1.3}
+  .stove .fire{font-size:11px}
+  .board{grid-column:1/-1;min-height:0;padding:5px 6px;flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px;border-width:2px;border-radius:10px}
+  .board .title{font-size:12px}
+  #boardItems{flex:1 1 120px;margin:0;font-size:22px;min-height:30px;align-content:center}
+  .board .row{flex:0 0 auto}
+  .btn{font-size:12px;padding:5px 8px}
+  #hand{margin-top:5px;font-size:13px;min-height:0;padding:3px}
+  #ings{grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:5px}
+  .ing{padding:2px 1px;border-radius:10px}
+  .ing b{font-size:24px}
+  .ing small{font-size:10px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #book{grid-template-columns:1fr 1fr;gap:5px}
+  .rec{padding:4px 6px;font-size:11px}
+  .rec .h{font-size:12px}
+  .rec .e{font-size:17px;letter-spacing:0}
+  #setBtn{top:8px;bottom:auto;left:8px;width:36px;height:36px;font-size:17px;border-width:2px}
+  .overlay,#setScr{padding:8px}
+  .panel{padding:14px;border-radius:16px;max-height:96vh;max-height:96dvh}
+  .panel h1{font-size:24px}
+  .panel .big{font-size:46px}
+  .menu h1{font-size:32px}
+  .btn.go{font-size:18px;padding:9px 18px}
+  .btn.alt,.btn.buy{font-size:16px}
+  .maptop h1{font-size:20px}
+  .stars{font-size:34px}
+  .sumtbl{font-size:13px}
+  #toast{top:auto;bottom:18px;font-size:13px}
+}
 </style>
 </head>
 <body>
