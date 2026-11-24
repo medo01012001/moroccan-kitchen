@@ -880,7 +880,11 @@ const VOICE={q:[],cur:null};
 function say(vid,clip,urgent){
   if(!AUD.vol.voices.on||!vid)return;
   const a=new Audio(`voices/${vid}/${clip}.mp3`);a.volume=volOf('voices');
-  if(urgent){VOICE.q.unshift(a)}else VOICE.q.push(a);
+  if(urgent){
+    // reactions (thanks / wrong / angry) cut off whatever is playing, so they match what just happened
+    if(VOICE.cur){VOICE.cur.onended=VOICE.cur.onerror=null;VOICE.cur.pause();VOICE.cur=null}
+    VOICE.q.unshift(a);
+  }else VOICE.q.push(a);
   if(VOICE.q.length>2)VOICE.q.length=2;
   if(!VOICE.cur)nextVoice();
 }
@@ -1072,8 +1076,8 @@ $('#customers').addEventListener('click',e=>{
   const i=+el.dataset.i, c=S.customers[i];
   if(!c)return;
   if(!S.hand){toast(`${c.name} باغي ${R[c.dish].name} ${R[c.dish].icon}`);return}
-  if(S.hand!==c.dish){toast(`${c.name}: ماشي هادا اللي طلبت! 😠`);sfx.bad();say(c.vid,'wrong',true);S.wrong++;c.pat-=c.max*.25;return}
-  say(c.vid,'thanks',true);
+  if(S.hand!==c.dish){toast(`${c.name}: ماشي هادا اللي طلبت! 😠 (باغي ${R[c.dish].icon} ${R[c.dish].name})`);sfx.bad();say(c.vid,'wrong',true);S.wrong++;c.pat-=c.max*.25;return}
+  say(c.vid,'thanks',true);toast(`${c.name}: شكرا! ${R[c.dish].icon} 😋`);
   const r=R[c.dish], tip=Math.round(c.pat/c.max*10);
   S.money+=r.price+tip;S.tips+=tip;S.served++;S.dishes[c.dish]=(S.dishes[c.dish]||0)+1;
   S.hand=null;S.customers[i]=null;
