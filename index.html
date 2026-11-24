@@ -1,0 +1,1296 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>مطبخ المغرب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3e4c6; --card:#fff8ea; --ink:#3a2412; --muted:#8a6a4a;
+  --wood:#9a6332; --wood2:#6e4220; --teal:#1f6f78; --gold:#e0a93b;
+  --red:#c0392b; --green:#2e8b57; --line:#e2cfa8;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:Cairo,system-ui,sans-serif;color:var(--ink);
+  background-color:var(--bg);
+  background-image:
+    repeating-conic-gradient(from 45deg at 50% 50%, rgba(31,111,120,.13) 0 25%, transparent 0 50%),
+    radial-gradient(circle at 50% 50%, rgba(224,169,59,.18) 18%, transparent 19%);
+  background-size:44px 44px,44px 44px;
+  user-select:none;
+}
+input{user-select:text;-webkit-user-select:text}
+#app{max-width:980px;margin:0 auto;padding:12px 16px 24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
+  background:var(--teal);color:#fff;border-radius:16px;padding:8px 14px;
+  box-shadow:0 4px 0 #134a50;border:3px solid var(--gold)}
+header h1{margin:0;font-size:20px;font-weight:900}
+.stats{display:flex;gap:8px;flex-wrap:wrap;font-weight:700}
+.stat{background:rgba(255,255,255,.16);padding:2px 10px;border-radius:999px;white-space:nowrap}
+.sect{margin-top:12px;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px;
+  box-shadow:0 3px 0 var(--line)}
+.sect h2{margin:0 0 8px;font-size:15px;color:var(--muted);font-weight:700}
+
+/* customers */
+#customers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cust{min-height:170px;border-radius:14px;border:2px dashed var(--line);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:8px;position:relative;cursor:pointer;transition:transform .1s}
+.cust.full{border-style:solid;background:#fff;border-color:#e6d3ad}
+.cust.target{border-color:var(--green);box-shadow:0 0 0 3px rgba(46,139,87,.25);animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.03)}}
+.cust .face{font-size:38px;line-height:1}
+.cust .name{font-size:12px;color:var(--muted);font-weight:700}
+.bubble{background:#fdf0d5;border-radius:12px;padding:4px 8px;margin-top:4px;font-size:13px;text-align:center;font-weight:700}
+.bubble .dish{font-size:26px;display:block}
+.hint{margin-top:4px;font-size:15px;background:#f1f7f4;border:1px dashed #9fcdb4;border-radius:8px;padding:0 6px;letter-spacing:1px}
+.pat{width:90%;height:8px;background:#eee;border-radius:9px;overflow:hidden;margin-top:6px}
+.pat i{display:block;height:100%;background:var(--green);transition:background .3s}
+.empty-txt{color:#c9b28a;font-size:13px}
+
+/* kitchen */
+#kitchen{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:10px}
+.stove{border-radius:14px;background:linear-gradient(#5a5a5a,#3b3b3b);color:#fff;min-height:150px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;
+  border:3px solid #2a2a2a;padding:8px;text-align:center}
+.stove .fire{font-size:14px;opacity:.35}
+.stove.cooking .fire{opacity:1;animation:flick .25s infinite alternate}
+@keyframes flick{to{transform:scale(1.15) translateY(-1px)}}
+.stove .pot{font-size:44px;line-height:1.1}
+.stove .lbl{font-size:13px;font-weight:700}
+.stove .bar{width:85%;height:8px;background:#222;border-radius:9px;overflow:hidden;margin-top:6px}
+.stove .bar i{display:block;height:100%;background:var(--gold)}
+.stove.ready{border-color:var(--green);box-shadow:0 0 12px rgba(46,139,87,.8)}
+.stove.ready .bar i{background:#e67e22}
+.stove.burnt{border-color:var(--red)}
+.stove.burnt .pot{filter:grayscale(1) brightness(.5)}
+.stove.warn{animation:shake .3s infinite}
+@keyframes shake{25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+
+.board{border-radius:14px;background:repeating-linear-gradient(90deg,var(--wood) 0 22px,#a76d39 22px 44px);
+  border:3px solid var(--wood2);padding:8px;display:flex;flex-direction:column;min-height:150px;color:#fff}
+.board .title{font-weight:900;font-size:14px;text-shadow:0 1px 0 #000}
+#boardItems{flex:1;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;margin:6px 0;font-size:30px}
+#boardItems span{background:rgba(255,255,255,.2);border-radius:10px;padding:0 4px;cursor:pointer}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font-family:inherit;font-weight:700;border:none;border-radius:10px;padding:6px 10px;cursor:pointer;font-size:14px;
+  box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.clear{background:#fff;color:var(--wood2)}
+.btn.trash{background:var(--red);color:#fff}
+
+#hand{margin-top:10px;text-align:center;font-weight:900;font-size:16px;min-height:30px;
+  background:#fff;border-radius:12px;padding:4px;border:2px solid var(--line)}
+#hand.has{background:#e8f6ee;border-color:var(--green)}
+
+/* ingredients */
+#ings{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
+.ing{background:#fff;border:2px solid var(--line);border-radius:12px;padding:4px 2px;text-align:center;cursor:pointer;
+  box-shadow:0 3px 0 var(--line);transition:transform .08s}
+.ing:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.ing.on{background:#fff1cf;border-color:var(--gold)}
+.ing b{display:block;font-size:30px;line-height:1.2}
+.ing small{font-size:12px;font-weight:700}
+
+/* recipes */
+#book{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.rec{background:#fff;border:2px solid var(--line);border-radius:12px;padding:6px 8px;font-size:13px}
+.rec .h{font-weight:900;font-size:14px}
+.rec .e{font-size:22px;letter-spacing:2px}
+
+/* overlays */
+.overlay{position:fixed;inset:0;background:rgba(40,22,8,.72);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.panel{background:var(--card);border:4px solid var(--gold);border-radius:20px;padding:20px;max-width:440px;width:100%;text-align:center;
+  max-height:94vh;overflow:auto}
+.panel.wide{max-width:920px;text-align:right}
+.panel h1{margin:0;font-size:30px;font-weight:900;color:var(--teal)}
+.panel p{line-height:1.8}
+.panel .big{font-size:60px;line-height:1.1}
+.btn.go{background:var(--green);color:#fff;font-size:20px;padding:10px 26px}
+.btn.alt{background:var(--teal);color:#fff;font-size:18px;padding:10px}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);font-size:16px;padding:8px}
+.btn.buy{background:var(--gold);color:var(--ink);font-size:18px;padding:10px}
+.btns{display:flex;flex-direction:column;gap:10px;align-items:stretch;margin-top:12px}
+.hidden{display:none!important}
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;
+  border-radius:999px;font-weight:700;z-index:40;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{opacity:1}
+.float{position:fixed;font-weight:900;font-size:22px;color:var(--green);pointer-events:none;z-index:25;animation:up 1s forwards}
+@keyframes up{to{transform:translateY(-50px);opacity:0}}
+
+/* menu */
+.menu{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 0,#fff3d6 0 40%,transparent 41%),var(--card)}
+.menu .logo{font-size:80px;line-height:1;animation:bob 2s ease-in-out infinite}
+.menu .steam{position:absolute;top:14px;right:50%;margin-right:-60px;font-size:26px;animation:steam 2.4s infinite}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-5deg)}}
+@keyframes steam{0%{opacity:0;transform:translateY(10px)}50%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+.menu h1{font-size:38px}
+.menu .sub{color:var(--muted);font-weight:700;margin-top:-4px}
+.dishrow{font-size:26px;letter-spacing:4px;margin:8px 0}
+.records{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.records span{background:#fdf0d5;border-radius:999px;padding:4px 12px;font-weight:700;font-size:13px}
+.chefcard{background:#fdf0d5;border-radius:14px;padding:6px 10px;font-weight:900;margin-top:8px}
+
+/* orbiting dishes (menu) */
+.orbit{position:relative;width:190px;height:190px;margin:0 auto}
+.orbit .center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:66px;
+  animation:bob 1.8s ease-in-out infinite;filter:drop-shadow(0 6px 4px rgba(0,0,0,.18))}
+.orbit .puff{position:absolute;left:50%;top:38px;font-size:20px;opacity:0;animation:steam 2.4s infinite}
+.orbit .puff:nth-of-type(2){margin-left:-26px;animation-delay:.8s}
+.orbit .puff:nth-of-type(3){margin-left:10px;animation-delay:1.6s}
+.ring{position:absolute;inset:0;animation:spin 14s linear infinite}
+.ring span{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;
+  transform:rotate(calc(var(--i)*45deg)) translate(78px) rotate(calc(var(--i)*-45deg))}
+.ring b{display:block;font-size:30px;line-height:40px;text-align:center;animation:spin 14s linear infinite reverse}
+.ring b i{display:block;font-style:normal;animation:hop 1.2s ease-in-out infinite;animation-delay:calc(var(--i)*.15s)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes hop{50%{transform:translateY(-6px) scale(1.12)}}
+.dishrow span{display:inline-block;animation:wave 1.6s ease-in-out infinite}
+@keyframes wave{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-8px) rotate(-10deg)}50%{transform:translateY(0) rotate(0)}75%{transform:translateY(-3px) rotate(8deg)}}
+
+/* loading */
+#loadScr{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background-color:var(--teal);color:#fff;transition:opacity .6s;padding:16px;
+  background-image:repeating-conic-gradient(from 45deg,rgba(255,255,255,.07) 0 25%,transparent 0 50%),
+    radial-gradient(circle,rgba(224,169,59,.25) 18%,transparent 19%);
+  background-size:44px 44px,44px 44px}
+#loadScr.gone{opacity:0;pointer-events:none}
+.ldtitle{font-size:34px;font-weight:900;text-shadow:0 3px 0 #134a50;animation:pop .6s backwards}
+.kitchenAnim{position:relative;width:220px;height:200px}
+.kitchenAnim .pot{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:96px;line-height:1;
+  animation:wobble .5s ease-in-out infinite alternate}
+@keyframes wobble{from{transform:translateX(-50%) rotate(-3deg)}to{transform:translateX(-50%) rotate(3deg)}}
+.kitchenAnim .drop{position:absolute;top:0;font-size:32px;opacity:0;animation:fall 2.1s ease-in infinite}
+@keyframes fall{0%{opacity:0;transform:translateY(-20px) rotate(0)}15%{opacity:1}
+  70%{opacity:1;transform:translateY(105px) rotate(220deg) scale(1)}85%{opacity:0;transform:translateY(125px) rotate(260deg) scale(.4)}100%{opacity:0}}
+.kitchenAnim .splash{position:absolute;bottom:78px;left:50%;font-size:22px;opacity:0;animation:steam 1.05s .7s infinite}
+.ldbar{width:min(320px,80vw);height:18px;border-radius:999px;background:rgba(0,0,0,.25);border:3px solid var(--gold);overflow:hidden}
+.ldbar i{display:block;height:100%;width:0;background:repeating-linear-gradient(45deg,var(--gold) 0 12px,#f3c65d 12px 24px);
+  background-size:34px 34px;animation:stripes .6s linear infinite}
+@keyframes stripes{to{background-position:34px 0}}
+.ldtip{font-weight:700;min-height:28px;font-size:17px}
+
+#setBtn{position:fixed;bottom:14px;left:14px;z-index:150;width:50px;height:50px;border-radius:50%;border:3px solid var(--gold);
+  background:var(--teal);color:#fff;font-size:24px;cursor:pointer;box-shadow:0 3px 0 #134a50}
+#setBtn:active{transform:translateY(2px)}
+#setScr{position:fixed;inset:0;background:rgba(40,22,8,.72);display:flex;align-items:center;justify-content:center;z-index:160;padding:16px}
+.setrow{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px;margin-top:10px;text-align:right}
+.setrow .sl{font-weight:900;font-size:16px}
+.setrow input{grid-column:1/-1;width:100%;accent-color:var(--teal);direction:ltr}
+.tog{font-family:inherit;font-weight:700;border:none;border-radius:999px;padding:4px 12px;cursor:pointer;background:#e8f6ee;color:var(--green)}
+.tog.off{background:#fde8e6;color:var(--red)}
+.setrow.off input{opacity:.35}
+#nowPlaying{margin-top:10px;font-weight:700;color:var(--muted)}
+
+/* character */
+.gender{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.gbtn{font-family:inherit;border:3px solid var(--line);background:#fff;border-radius:16px;padding:10px;cursor:pointer;font-weight:900;font-size:18px;color:var(--ink)}
+.gbtn span{display:block;font-size:46px;line-height:1.1}
+.gbtn.on{border-color:var(--green);background:#e8f6ee}
+.avatars{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0}
+.av{font-size:32px;border:3px solid transparent;background:#fff;border-radius:12px;cursor:pointer;padding:4px 0}
+.av.on{border-color:var(--gold);background:#fff1cf;transform:scale(1.08)}
+.namein{width:100%;font-family:inherit;font-size:20px;font-weight:700;padding:8px 12px;border-radius:12px;border:3px solid var(--line);text-align:center;background:#fff;color:var(--ink)}
+.namein:focus{outline:none;border-color:var(--teal)}
+.lbl2{font-weight:700;color:var(--muted);margin-top:10px;font-size:14px}
+.preview{font-size:18px;font-weight:900;margin-top:10px}
+
+/* summary */
+.sumtbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px}
+.sumtbl td{padding:5px 4px;border-bottom:1px dashed var(--line);text-align:right}
+.sumtbl td:last-child{text-align:left;font-weight:900;direction:ltr;unicode-bidi:isolate}
+.sumtbl tr.total td{border-top:2px solid var(--ink);border-bottom:none;font-size:18px}
+.pos{color:var(--green)}.neg{color:var(--red)}
+.stars{font-size:42px;letter-spacing:6px}
+.stars span{display:inline-block;animation:pop .4s backwards}
+.stars span.off{filter:grayscale(1);opacity:.35}
+@keyframes pop{from{transform:scale(0)}}
+.dishes{font-size:20px;line-height:1.8}
+.goal{height:8px;background:rgba(255,255,255,.25);border-radius:9px;overflow:hidden;width:70px;display:inline-block;vertical-align:middle}
+.goal i{display:block;height:100%;width:0;background:var(--gold);transition:width .3s}
+.goal i.done{background:#7be495}
+.notice{background:#fff1cf;border:2px solid var(--gold);border-radius:12px;padding:8px;font-weight:700;margin-top:8px}
+
+/* tutorial */
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
+.chip{background:#fff;border:2px solid var(--line);border-radius:12px;padding:4px 10px;font-weight:700}
+.chip b{font-size:26px;display:block}
+.plus{align-self:center;font-weight:900;font-size:20px;color:var(--muted)}
+
+/* map */
+.maptop{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.maptop h1{font-size:26px}
+.mapwrap{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start}
+#map svg{width:100%;height:auto;display:block;background:#bfe3ea;border-radius:14px;border:3px solid var(--teal)}
+.reg{stroke:#fff;stroke-width:1.4;stroke-linejoin:round;cursor:pointer;fill:#d9ccb0;transition:filter .15s}
+.reg:hover{filter:brightness(1.08)}
+.reg.next{fill:#ffe39a;animation:glow 1.1s infinite alternate}
+@keyframes glow{to{fill:#ffc94d}}
+.selline{fill:none;stroke:#3a2412;stroke-width:3;stroke-linejoin:round;pointer-events:none}
+.rdot{fill:#fff;stroke:#3a2412;stroke-width:1;pointer-events:none}
+.rnum{font:900 11px Cairo,sans-serif;fill:#3a2412;pointer-events:none;text-anchor:middle;dominant-baseline:central}
+.remo{font-size:14px;pointer-events:none;text-anchor:middle;dominant-baseline:central}
+.sea{font:700 13px Cairo,sans-serif;fill:#2a7f8a;opacity:.8;text-anchor:middle}
+#regInfo{background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px}
+#regInfo h2{margin:0;font-size:22px;color:var(--teal)}
+.status{display:inline-block;border-radius:999px;padding:2px 12px;font-weight:700;font-size:14px;margin:6px 0}
+.st-own{background:#e8f6ee;color:var(--green)}.st-next{background:#fff1cf;color:#a5700d}.st-lock{background:#eee;color:#888}
+.rdish{display:flex;align-items:center;gap:8px;border-bottom:1px dashed var(--line);padding:4px 0;font-weight:700}
+.rdish b{font-size:24px}
+.rlist{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.rlist span{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:#eee;cursor:pointer}
+.rlist span.own{background:#e8f6ee;color:var(--green)}
+.rlist span.nx{background:#fff1cf}
+
+@media (max-width:700px){
+  .mapwrap{grid-template-columns:1fr}
+  #kitchen{grid-template-columns:1fr 1fr}
+  .board{grid-column:1/-1;min-height:110px}
+  .cust{min-height:160px;padding:4px}
+  .cust .face{font-size:30px}
+  .bubble{font-size:11px}
+  .hint{font-size:12px;letter-spacing:0}
+  header h1{font-size:17px}
+  .avatars{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1 id="chefTitle">👩‍🍳 الشافة</h1>
+    <div class="stats">
+      <span class="stat">📍 <b id="city">طنجة</b></span>
+      <span class="stat">📅 <b id="day">1</b></span>
+      <span class="stat">⏰ <b id="clock">09:00</b></span>
+      <span class="stat">💰 <b id="money">0</b> / <span id="target">100</span> <span class="goal"><i id="goalBar"></i></span></span>
+      <span class="stat" id="hearts">❤️❤️❤️</span>
+      <span class="stat">🏦 <b id="bank">0</b></span>
+    </div>
+  </header>
+
+  <div class="sect">
+    <h2>الكليان 🧍 (كليكي على الكليان باش تعطيه الماكلة)</h2>
+    <div id="customers"></div>
+  </div>
+
+  <div class="sect">
+    <h2>الكوزينة 🔥 (<span data-g="حط|حطي">حط</span> العناصر فالطبلة، ومن بعد كليكي على الكانون)</h2>
+    <div id="kitchen">
+      <div class="stove" data-i="0"></div>
+      <div class="stove" data-i="1"></div>
+      <div class="board">
+        <div class="title">🪵 الطبلة</div>
+        <div id="boardItems"></div>
+        <div class="row">
+          <button class="btn clear" id="clearBtn">🧽 <span data-g="خوي|خويي">خوي</span> الطبلة</button>
+          <button class="btn trash" id="trashBtn">🗑️ <span data-g="لوح|لوحي">لوح</span> الطبسيل</button>
+        </div>
+      </div>
+    </div>
+    <div id="hand">✋ يديك خاويين</div>
+  </div>
+
+  <div class="sect">
+    <h2>العناصر 🧺</h2>
+    <div id="ings"></div>
+  </div>
+
+  <div class="sect">
+    <h2 id="bookTitle">منيو المطعم 📖</h2>
+    <div id="book"></div>
+  </div>
+</div>
+
+<!-- main menu -->
+<div class="overlay" id="startScr">
+  <div class="panel menu">
+    <div class="orbit">
+      <div class="puff">♨️</div><div class="puff">♨️</div><div class="puff">♨️</div>
+      <div class="center">🥘</div>
+      <div class="ring">
+        <span style="--i:0"><b><i>🫖</i></b></span><span style="--i:1"><b><i>🥧</i></b></span>
+        <span style="--i:2"><b><i>🍲</i></b></span><span style="--i:3"><b><i>🏺</i></b></span>
+        <span style="--i:4"><b><i>🫓</i></b></span><span style="--i:5"><b><i>🦪</i></b></span>
+        <span style="--i:6"><b><i>🍛</i></b></span><span style="--i:7"><b><i>🍯</i></b></span>
+      </div>
+    </div>
+    <h1>مطبخ المغرب</h1>
+    <div class="sub">من طنجة حتى للكويرة 🗺️</div>
+    <div class="dishrow"><span>🍅</span> <span style="animation-delay:.15s">🧅</span> <span style="animation-delay:.3s">🥕</span>
+      <span style="animation-delay:.45s">🌶️</span> <span style="animation-delay:.6s">🍋</span> <span style="animation-delay:.75s">🌿</span></div>
+    <div class="chefcard hidden" id="chefCard"></div>
+    <div class="btns">
+      <button class="btn alt hidden" id="contBtn">▶ كمل اللعبة</button>
+      <button class="btn go" id="newBtn">🍳 لعبة جديدة</button>
+      <button class="btn ghost" id="howBtn">📖 كيفاش نلعب؟</button>
+    </div>
+    <div class="records">
+      <span>🏪 أكثر مطاعم: <b id="recOwned">1</b>/12</span>
+      <span>🏦 أكبر صندوق: <b id="recMoney">0</b> درهم</span>
+    </div>
+  </div>
+</div>
+
+<!-- character -->
+<div class="overlay hidden" id="charScr">
+  <div class="panel">
+    <h1>شكون نتا/نتي؟ 🤔</h1>
+    <div class="gender">
+      <button class="gbtn" data-g="m"><span>👨‍🍳</span>طباخ</button>
+      <button class="gbtn" data-g="f"><span>👩‍🍳</span>طباخة</button>
+    </div>
+    <div class="lbl2">ختار الأيقونة ديالك:</div>
+    <div class="avatars" id="avatars"></div>
+    <div class="lbl2">شنو سميتك؟</div>
+    <input class="namein" id="nameIn" maxlength="14" placeholder="كتب سميتك هنا…">
+    <div class="preview" id="charPrev"></div>
+    <div class="btns">
+      <button class="btn go" id="charGo">يلاه نبداو! ▶</button>
+      <button class="btn ghost" data-menu>رجع ↩</button>
+    </div>
+  </div>
+</div>
+
+<!-- how to -->
+<div class="overlay hidden" id="howScr">
+  <div class="panel">
+    <div class="big">📖</div>
+    <h1>كيفاش نلعب؟</h1>
+    <p style="text-align:right">
+    🗺️ كتبدا بمطعم صغير فطنجة. <span data-g="جمع|جمعي">جمع</span> الفلوس <span data-g="وشري|وشريي">وشري</span> مطاعم فالجهات من الشمال حتى للجنوب (١٢ جهة).<br>
+    🍽️ كل جهة عندها الماكلة ديالها.<br>
+    🆕 أول مرة كيطلب شي كليان ماكلة جديدة، كيبان ليك شرح ديال الوصفة. من بعد كيبقا غير إرشاد صغير تحت الطلب.<br>
+    🧺 كليكي على العناصر باش تحطهم فالطبلة، ومن بعد كليكي على كانون خاوي باش تطيب.<br>
+    ✋ ملي توجد الماكلة، <span data-g="هزها وعطيها|هزيها وعطيها">هزها وعطيها</span> للكليان اللي طلبها.<br>
+    💨 <span data-g="رد|ردي">رد</span> بالك: الماكلة كتحرق إلا خليتيها فالكانون بزاف!<br>
+    ⏰ النهار من 9:00 حتى 18:00. <span data-g="وصل|وصلي">وصل</span> للهدف باش تاخد النجوم ⭐.<br>
+    ❤️ إلا مشاو ٣ ديال الكليان معصبين، كتسد بكري داك النهار.</p>
+    <button class="btn go" data-menu>رجع ↩</button>
+  </div>
+</div>
+
+<!-- generic message -->
+<div class="overlay hidden" id="msgScr">
+  <div class="panel">
+    <div class="big" id="msgIcon">🏪</div>
+    <h1 id="msgTitle"></h1>
+    <p id="msgTxt"></p>
+    <button class="btn go" id="msgBtn">يلاه!</button>
+  </div>
+</div>
+
+<!-- map -->
+<div class="overlay hidden" id="mapScr">
+  <div class="panel wide">
+    <div class="maptop">
+      <h1>🗺️ خريطة المطاعم</h1>
+      <div class="stats" style="color:var(--ink)">
+        <span class="stat" style="background:#fdf0d5">🏦 <b id="mBank">0</b> درهم</span>
+        <span class="stat" style="background:#fdf0d5">🏪 <b id="mOwned">1</b>/12</span>
+        <span class="stat" style="background:#fdf0d5">📅 <b id="mDays">0</b> نهار</span>
+      </div>
+    </div>
+    <div class="mapwrap">
+      <div id="map"></div>
+      <div>
+        <div id="regInfo"></div>
+        <div class="rlist" id="rlist"></div>
+        <div class="btns"><button class="btn ghost" data-menu>🏠 القائمة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- day intro -->
+<div class="overlay hidden" id="dayScr">
+  <div class="panel">
+    <div class="big">☀️</div>
+    <h1 id="diTitle">النهار 1</h1>
+    <p id="diTxt"></p>
+    <div class="btns">
+      <button class="btn go" id="diGo"><span data-g="حل|حلي">حل</span> المطعم! 🔓</button>
+      <button class="btn ghost" id="diMap">🗺️ الخريطة</button>
+    </div>
+  </div>
+</div>
+
+<!-- tutorial -->
+<div class="overlay hidden" id="tutScr">
+  <div class="panel">
+    <div style="font-weight:900;color:var(--green)">🆕 طلب جديد!</div>
+    <div class="big" id="tutIcon">🥣</div>
+    <h1 id="tutName"></h1>
+    <p id="tutDesc" style="margin:4px 0"></p>
+    <div style="font-weight:700;color:var(--muted)">باش توجدها، <span data-g="حط|حطي">حط</span> فالطبلة:</div>
+    <div class="chips" id="tutChips"></div>
+    <div style="font-weight:700" id="tutInfo"></div>
+    <div class="btns"><button class="btn go" id="tutGo">فهمت! 👍</button></div>
+  </div>
+</div>
+
+<!-- day end -->
+<div class="overlay hidden" id="endScr">
+  <div class="panel">
+    <div class="big">🌙</div>
+    <h1 id="deTitle">سالا النهار</h1>
+    <div class="stars" id="deStars"></div>
+    <div id="deMsg" style="font-weight:700"></div>
+    <table class="sumtbl" id="deTbl"></table>
+    <div class="dishes" id="deDishes"></div>
+    <div class="notice hidden" id="deBuy"></div>
+    <div class="btns">
+      <button class="btn go" id="deNext">النهار الجاي ☀️</button>
+      <button class="btn alt" id="deMap">🗺️ الخريطة</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<button id="setBtn" title="الإعدادات">⚙️</button>
+<div id="setScr" class="hidden">
+  <div class="panel">
+    <div class="big">⚙️</div>
+    <h1>الإعدادات</h1>
+    <div class="setrow" data-k="music"><span class="sl">🎵 الموسيقى</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05"></div>
+    <div class="setrow" data-k="voices"><span class="sl">🗣️ أصوات الكليان</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05"></div>
+    <div class="setrow" data-k="sfx"><span class="sl">🔔 المؤثرات وجو المطعم</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05"></div>
+    <div id="nowPlaying"></div>
+    <div class="btns">
+      <button class="btn go" id="setClose">رجع للعب ✔</button>
+      <button class="btn ghost hidden" id="setQuit">🏠 خرج للقائمة</button>
+    </div>
+  </div>
+</div>
+
+<!-- loading -->
+<div id="loadScr">
+  <div class="ldtitle">🍲 مطبخ المغرب</div>
+  <div class="kitchenAnim">
+    <span class="drop" style="left:30px;animation-delay:0s">🍅</span>
+    <span class="drop" style="left:90px;animation-delay:.35s">🧅</span>
+    <span class="drop" style="left:150px;animation-delay:.7s">🥕</span>
+    <span class="drop" style="left:60px;animation-delay:1.05s">🌶️</span>
+    <span class="drop" style="left:125px;animation-delay:1.4s">🧄</span>
+    <span class="drop" style="left:95px;animation-delay:1.75s">🍋</span>
+    <span class="splash">💦</span>
+    <div class="pot">🍲</div>
+  </div>
+  <div class="ldbar"><i id="ldFill"></i></div>
+  <div class="ldtip" id="ldTip">كنشعلو الكانون… 🔥</div>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const ING = {
+  tea:['🍵','أتاي'], mint:['🍃','نعناع'], sugar:['🍬','سكر'], fava:['🫘','فول'], olive:['🫒','زيت العود'],
+  cumin:['🧂','كامون'], garlic:['🧄','ثوم'], fish:['🐟','حوت'], tomato:['🍅','مطيشة'], chili:['🌶️','فلفلة'],
+  greens:['🥬','بقولة'], lemon:['🍋','حامض'], chickpea:['🥜','حمص'], egg:['🥚','بيض'], semolina:['🥣','سميدة'],
+  meat:['🥩','لحم'], carrot:['🥕','خيزو'], onion:['🧅','بصلة'], butter:['🧈','زبدة'], chicken:['🍗','دجاج'],
+  almond:['🌰','لوز'], cinnamon:['🪵','قرفة'], flour:['🌾','دقيق'], raisin:['🍇','زبيب'], honey:['🍯','عسل'],
+  lentil:['🟠','عدس'], parsley:['🌿','معدنوس'], prunes:['🫐','برقوق'], vermicelli:['🍜','شعرية'], pumpkin:['🎃','كرعة'],
+  kefta:['🍖','كفتة'], snail:['🐌','ببوش'], msemen:['🫓','مسمن'], orange:['🍊','ليمون'], saffron:['🌼','زعفران'],
+  sardine:['🐠','سردين'], dates:['🌴','تمر'], milk:['🥛','حليب'], potato:['🥔','بطاطا'], argan:['🌳','زيت أركان'],
+  camel:['🐪','لحم الجمل'], liver:['🍢','كبدة'], rice:['🍚','روز'], oyster:['🦪','محار'], octopus:['🐙','أخطبوط'],
+};
+const R = {
+  atay:{name:'أتاي بالنعناع',icon:'🫖',ing:['tea','mint','sugar'],time:3,price:15,desc:'أتاي مغربي بالنعناع، حتى ماكلة ما كتكمل بلا بيه!'},
+  bissara:{name:'بيصارة',icon:'🥣',ing:['fava','olive','cumin','garlic'],time:5,price:25,desc:'بيصارة سخونة بالفول اليابس وزيت العود، الفطور ديال الشتا فالشمال.'},
+  bqoula:{name:'بقولة',icon:'🥗',ing:['greens','olive','garlic','lemon'],time:4,price:22,desc:'الخبيزة مطيبة بالثوم وزيت العود والحامض.'},
+  fishtajine:{name:'طاجين الحوت',icon:'🥘',ing:['fish','tomato','chili','garlic'],time:7,price:40,desc:'طاجين الحوت على طريقة الشمال بالمطيشة والفلفلة.'},
+  karantita:{name:'كرانطيطة',icon:'🍮',ing:['chickpea','egg','olive','cumin'],time:5,price:28,desc:'الأكلة الشعبية ديال وجدة، بالحمص والبيض.'},
+  berkoukech:{name:'بركوكش',icon:'🍛',ing:['semolina','meat','carrot','onion'],time:8,price:45,desc:'حبات كبار ديال السميدة مطيبين باللحم والخضرة.'},
+  mechoui:{name:'مشوي',icon:'🍖',ing:['meat','cumin','butter'],time:7,price:50,desc:'مشوي ديال الحولي بالزبدة والكامون، فخر الشرق.'},
+  pastilla:{name:'بسطيلة',icon:'🥧',ing:['chicken','egg','almond','cinnamon','flour'],time:9,price:70,desc:'البسطيلة الفاسية: دجاج ولوز وقرفة وسط الورقة.'},
+  mrouzia:{name:'مروزية',icon:'🥘',ing:['meat','raisin','almond','honey'],time:8,price:60,desc:'لحم بالزبيب واللوز والعسل، حلوة ومالحة فنفس الوقت.'},
+  harira:{name:'حريرة',icon:'🍲',ing:['tomato','lentil','parsley','flour'],time:5,price:25,desc:'حريرة بالعدس والمعدنوس، ما كتغيبش على الطابلة.'},
+  prunes:{name:'طاجين البرقوق',icon:'🥘',ing:['meat','prunes','almond','cinnamon'],time:8,price:55,desc:'لحم بالبرقوق واللوز، أكلة الأعراس الرباطية.'},
+  sellou:{name:'سلو',icon:'🍪',ing:['flour','almond','honey','butter'],time:4,price:30,desc:'سلو باللوز والعسل، كيعطي الجهد!'},
+  seffa:{name:'سفة',icon:'🍝',ing:['vermicelli','sugar','cinnamon','almond'],time:5,price:35,desc:'سفة بالشعرية والسكر والقرفة واللوز.'},
+  couscous:{name:'كسكس بسبع خضاري',icon:'🍛',ing:['semolina','meat','carrot','pumpkin','onion'],time:9,price:55,desc:'الكسكس ديال نهار الجمعة!'},
+  kefta:{name:'طاجين الكفتة',icon:'🍳',ing:['kefta','tomato','egg','cumin'],time:6,price:40,desc:'كفتة بالمطيشة والبيض فالطاجين.'},
+  babbouche:{name:'ببوش',icon:'🐌',ing:['snail','cumin','chili'],time:4,price:20,desc:'ببوش سخون بالكامون والفلفلة، ديال الزنقة فكازا.'},
+  rfissa:{name:'رفيسة',icon:'🫕',ing:['msemen','chicken','lentil','onion'],time:9,price:65,desc:'المسمن المقطع بالدجاج والعدس، أكلة الضياف.'},
+  chicken:{name:'طاجين الدجاج',icon:'🥘',ing:['chicken','onion','olive','lemon'],time:7,price:45,desc:'دجاج بالزيتون والحامض المرقد.'},
+  orange:{name:'عصير الليمون',icon:'🧃',ing:['orange','sugar'],time:2,price:12,desc:'عصير الليمون ديال بني ملال، طري وحلو.'},
+  tanjia:{name:'طنجية',icon:'🏺',ing:['meat','lemon','cumin','saffron','garlic'],time:9,price:70,desc:'الطنجية المراكشية كتطيب فالفرناتشي ساعات طوال!'},
+  sardine:{name:'سردين معمر',icon:'🐟',ing:['sardine','parsley','garlic','cumin'],time:5,price:30,desc:'سردين ديال آسفي معمر بالشرمولة.'},
+  msemen:{name:'مسمن بالعسل',icon:'🫓',ing:['flour','butter','honey'],time:4,price:20,desc:'مسمن مورق بالزبدة والعسل.'},
+  medfouna:{name:'مدفونة',icon:'🥙',ing:['flour','meat','onion','egg','almond'],time:9,price:65,desc:'البيتزا ديال الريصاني، معمرة باللحم والبصلة.'},
+  datemilk:{name:'حليب بالتمر',icon:'🥛',ing:['dates','milk','almond'],time:3,price:20,desc:'حليب بالتمر المجهول ديال تافيلالت.'},
+  vegtajine:{name:'طاجين الخضرة',icon:'🥘',ing:['potato','carrot','tomato','onion'],time:6,price:35,desc:'طاجين الخضرة ديال الدار.'},
+  amlou:{name:'أملو',icon:'🍯',ing:['almond','argan','honey'],time:3,price:30,desc:'لوز وزيت أركان وعسل، الذهب ديال سوس!'},
+  asida:{name:'عصيدة',icon:'🥣',ing:['semolina','argan','honey'],time:5,price:35,desc:'العصيدة بالسميدة وزيت أركان والعسل.'},
+  grilled:{name:'حوت مشوي',icon:'🐠',ing:['fish','lemon','cumin','chili'],time:6,price:45,desc:'حوت طري مشوي فمرسى أكادير.'},
+  sahtea:{name:'أتاي صحراوي',icon:'🫖',ing:['tea','sugar'],time:4,price:20,desc:'أتاي صحراوي بلا نعناع، كيتشرب على ثلاث كيسان!'},
+  camel:{name:'طاجين لحم الجمل',icon:'🐪',ing:['camel','onion','cumin','saffron'],time:8,price:70,desc:'طاجين لحم الجمل، أكلة الصحرا.'},
+  camelmilk:{name:'حليب النوق بالتمر',icon:'🍶',ing:['milk','dates'],time:2,price:18,desc:'حليب النوق بالتمر، ضيافة الصحرا.'},
+  malfouf:{name:'ملفوف',icon:'🍢',ing:['liver','cumin','onion'],time:5,price:45,desc:'الكبدة مشوية بالكامون على الطريقة الصحراوية.'},
+  zrig:{name:'زريگ',icon:'🥤',ing:['milk','sugar'],time:2,price:15,desc:'حليب بالسكر وبارد، كيبرد فالسخانة.'},
+  riz:{name:'روز باللحم',icon:'🍚',ing:['rice','meat','onion','carrot'],time:8,price:60,desc:'روز باللحم والخيزو على الطريقة الصحراوية.'},
+  oysters:{name:'محار الداخلة',icon:'🦪',ing:['oyster','lemon'],time:3,price:50,desc:'محار الداخلة الطري بالحامض، معروف فالعالم كامل!'},
+  octopus:{name:'طاجين الأخطبوط',icon:'🐙',ing:['octopus','tomato','garlic','chili'],time:8,price:80,desc:'أخطبوط بالمطيشة والفلفلة.'},
+  marrou:{name:'مارو بالحوت',icon:'🍛',ing:['rice','fish','onion','tomato'],time:8,price:70,desc:'روز بالحوت، أكلة الداخلة.'},
+};
+// map points [lon,lat]
+const PT = {
+  TNG:[-5.9,35.8],CEU:[-5.3,35.9],HOC:[-3.9,35.25],J3:[-3.6,35.2],NAD:[-2.9,35.2],SAI:[-2.2,35.1],OUJ:[-1.75,34.7],
+  FIG:[-1.2,32.1],B0:[-2.5,31.7],B1:[-3.7,30.8],B2:[-5.6,29.7],B3:[-7.6,29.4],B3b:[-8.1,29.1],B4:[-8.7,28.7],B5:[-8.7,27.7],
+  M1:[-8.7,26.0],M2:[-12.0,26.0],M3:[-12.0,23.5],M4:[-13.1,22.8],M5:[-13.0,21.3],M6:[-17.0,21.3],
+  LAR:[-6.3,34.95],KEN:[-6.6,34.3],RAB:[-6.85,34.0],BOU:[-7.15,33.8],CAS:[-7.6,33.6],JAD:[-8.5,33.25],OUA:[-9.0,32.75],
+  SAF:[-9.25,32.3],ESS:[-9.8,31.5],TAM:[-9.8,30.8],AGA:[-9.65,30.4],TIZ:[-9.9,29.7],IFN:[-10.2,29.4],TAN:[-11.1,28.4],
+  TB:[-12.0,28.1],TAR:[-12.9,27.9],LAY:[-13.4,27.1],BOJ:[-14.5,26.1],LD:[-14.9,25.0],DAK:[-15.9,23.7],DK2:[-16.5,22.3],
+  J1:[-5.6,34.8],J2:[-4.3,34.85],J4:[-5.6,34.2],J5:[-5.8,33.3],J6:[-6.6,33.3],J7:[-3.5,34.6],J8:[-4.0,32.9],J9:[-5.3,32.8],
+  J11:[-6.5,31.7],J12:[-7.3,32.4],J14:[-7.8,32.3],J15:[-7.8,30.9],L2:[-12.0,25.0],
+};
+const REGIONS = [
+  {name:'طنجة - تطوان - الحسيمة',city:'طنجة',price:0,color:'#4fb3bf',dishes:['atay','bissara','bqoula','fishtajine'],
+   poly:'TNG CEU HOC J3 J7 J2 J1 LAR'},
+  {name:'جهة الشرق',city:'وجدة',price:250,color:'#e07a5f',dishes:['atay','karantita','berkoukech','mechoui'],
+   poly:'J3 NAD SAI OUJ FIG B0 J8 J7'},
+  {name:'فاس - مكناس',city:'فاس',price:450,color:'#81b29a',dishes:['atay','pastilla','mrouzia','harira'],
+   poly:'J1 J2 J7 J8 J9 J5 J4'},
+  {name:'الرباط - سلا - القنيطرة',city:'الرباط',price:650,color:'#f2cc8f',dishes:['atay','prunes','sellou','seffa'],
+   poly:'LAR KEN RAB BOU J6 J5 J4 J1'},
+  {name:'الدار البيضاء - سطات',city:'كازا',price:900,color:'#9c89b8',dishes:['atay','couscous','kefta','babbouche'],
+   poly:'BOU CAS JAD OUA J14 J12 J6'},
+  {name:'بني ملال - خنيفرة',city:'بني ملال',price:1150,color:'#f4978e',dishes:['atay','rfissa','chicken','orange'],
+   poly:'J5 J9 J11 J12 J6'},
+  {name:'مراكش - آسفي',city:'مراكش',price:1450,color:'#e9c46a',dishes:['atay','tanjia','sardine','msemen'],
+   poly:'OUA SAF ESS TAM J15 J11 J12 J14'},
+  {name:'درعة - تافيلالت',city:'الراشيدية',price:1750,color:'#d4a373',dishes:['atay','medfouna','datemilk','vegtajine'],
+   poly:'J9 J8 B0 B1 B2 B3 J15 J11'},
+  {name:'سوس - ماسة',city:'أكادير',price:2100,color:'#90be6d',dishes:['atay','amlou','asida','grilled'],
+   poly:'TAM AGA TIZ B3b B3 J15'},
+  {name:'كلميم - واد نون',city:'كلميم',price:2450,color:'#f8961e',dishes:['sahtea','camel','camelmilk'],
+   poly:'TIZ IFN TAN TB B5 B4 B3b'},
+  {name:'العيون - الساقية الحمراء',city:'العيون',price:2850,color:'#c08552',dishes:['sahtea','malfouf','zrig','riz'],
+   poly:'TB TAR LAY BOJ LD L2 M2 M1 B5'},
+  {name:'الداخلة - وادي الذهب',city:'الداخلة',price:3300,color:'#43aa8b',dishes:['sahtea','oysters','octopus','marrou'],
+   poly:'LD DAK DK2 M6 M5 M4 M3 L2'},
+];
+const AVATARS = {m:['👨‍🍳','👨🏽‍🍳','👨🏾‍🍳','🧔','👴','👦'], f:['👩‍🍳','👩🏽‍🍳','👩🏾‍🍳','🧕','👵','👧']};
+// [face, name, voice folder, what they say before the dish, after the dish] (voices/<id>/<dish|thanks|wrong|angry>.mp3)
+const PEOPLE = [
+  ['👴','با علال','alal','الله يرحم الوالدين بغيت',''],['👵','مي فاطنة','fatna','الله يخليك بغيت',''],
+  ['👨','سي محمد','mohamed','السلام عليكم، عافاك بغيت',''],['🧕','لالة زهرة','zahra','صباح الخير، بغيت',''],
+  ['👳‍♂️','الحاج عمر','omar','بسم الله، جيب ليا',''],['👦','حميد','hamid','عافاك بغيت',''],
+  ['👧','سلمى','salma','عافاك عطيني',''],['🧔','سي العربي','arbi','جوعان بزاف! بغيت',''],
+  ['👩','خديجة','khadija','واش كاين','؟'],['🧑‍🎓','ياسين','yassine','دغيا عافاك، عندي القراية! بغيت',''],
+  ['👮','الشرطي','police','السلام، بغيت',''],['🧑‍🌾','عمي الفلاح','farmer','الله يعاونك، بغيت',''],
+];
+const BURN = 7, DAY_LEN = 100;
+
+const $ = s=>document.querySelector(s);
+let S, G, last=0, running=false, paused=false;
+
+/* ================= AUDIO ENGINE ================= */
+let AC;
+const AUD={master:null,music:null,musicBus:null,sfxBus:null,amb:null,ambDry:null,noise:null,mode:'menu',
+  vol:{music:{on:true,v:.8},voices:{on:true,v:1},sfx:{on:true,v:.8}}};
+try{const v=JSON.parse(localStorage.getItem('matbakh2_vol'));if(v)AUD.vol=v}catch(e){}
+const volOf=k=>AUD.vol[k].on?AUD.vol[k].v:0;
+function initAudio(){
+  if(AC){if(AC.state==='suspended')AC.resume();return}
+  try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return}
+  AUD.master=AC.createGain();AUD.master.gain.value=.85;AUD.master.connect(AC.destination);
+  AUD.musicBus=AC.createGain();AUD.musicBus.gain.value=volOf('music');AUD.musicBus.connect(AUD.master);
+  AUD.sfxBus=AC.createGain();AUD.sfxBus.gain.value=volOf('sfx');AUD.sfxBus.connect(AUD.master);
+  AUD.music=AC.createGain();AUD.music.gain.value=0;AUD.music.connect(AUD.musicBus);
+  // restaurant bus: voices muffled like a room
+  const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1700;lp.connect(AUD.sfxBus);
+  AUD.amb=AC.createGain();AUD.amb.gain.value=0;AUD.amb.connect(lp);
+  AUD.ambDry=AC.createGain();AUD.ambDry.gain.value=0;AUD.ambDry.connect(AUD.sfxBus);
+  const len=AC.sampleRate*2, buf=AC.createBuffer(1,len,AC.sampleRate), d=buf.getChannelData(0);
+  let b=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;b=.97*b+.03*w;d[i]=w*.5+b*3}
+  AUD.noise=buf;
+  startMusic();setAudioMode(AUD.mode);
+}
+function setAudioMode(m,style){
+  AUD.mode=m;
+  setMusicStyle(style||(m==='game'||m==='region'?REGION_STYLE[G?G.cur:0]:'menu'));
+  if(!AC)return;
+  const t=AC.currentTime;
+  AUD.music.gain.setTargetAtTime(m==='game'?.32:.6,t,.6);
+  AUD.amb.gain.setTargetAtTime(m==='game'?1:0,t,.8);
+  AUD.ambDry.gain.setTargetAtTime(m==='game'?1:0,t,.8);
+  m==='game'?startAmb():setTimeout(()=>{if(AUD.mode!=='game')stopAmb()},2500);
+}
+function applyVolumes(){
+  try{localStorage.setItem('matbakh2_vol',JSON.stringify(AUD.vol))}catch(e){}
+  if(AC){AUD.musicBus.gain.setTargetAtTime(volOf('music'),AC.currentTime,.1);AUD.sfxBus.gain.setTargetAtTime(volOf('sfx'),AC.currentTime,.1)}
+  if(VOICE.cur)VOICE.cur.volume=volOf('voices');
+  const allOff=!AUD.vol.music.on&&!AUD.vol.voices.on&&!AUD.vol.sfx.on;
+  $('#setBtn').textContent=allOff?'🔇':'⚙️';
+}
+function env(g,t,peak,att,dec){g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+att);g.gain.exponentialRampToValueAtTime(.0001,t+att+dec)}
+function noiseSrc(t,dur){const s=AC.createBufferSource();s.buffer=AUD.noise;s.start(t,Math.random()*1.5);s.stop(t+dur);return s}
+
+/* ---- Moroccan music: one style per region (generated live with WebAudio) ---- */
+const NOTE=n=>293.66*Math.pow(2,n/12);   // semitones from D4
+const STYLES={
+  menu:    {name:'مغربي',bpm:108,scale:[0,1,4,5,7,8,10,12,13,16],lead:'oud',drum:['D','T',0,'T','D',0,'T',0],riqq:.5,fixed:true},
+  andalusi:{name:'الطرب الأندلسي',bpm:92,scale:[0,2,4,5,7,9,11,12,14,16],lead:'violin',lead2:'oud',drum:['D',0,'T',0,'D','T','T',0],riqq:.6},
+  rai:     {name:'الراي والركادة',bpm:124,scale:[0,1,4,5,7,8,10,12,13],lead:'flute',drum:['D','T','T','D','T','T','D','C'],claps:true},
+  malhoun: {name:'الملحون',bpm:96,scale:[0,2,3,5,7,8,10,12,14,15],lead:'oud',lead2:'violin',drum:['D','T',0,'T','D',0,'T',0],riqq:.5},
+  rbati:   {name:'الآلة الرباطية',bpm:100,scale:[0,1,3,5,7,8,10,12,13,15],lead:'violin',drum:['D',0,'T','T','D',0,'T',0],riqq:.4},
+  chaabi:  {name:'الشعبي',bpm:138,scale:[0,1,4,5,7,8,10,12,13,16],lead:'violin',drum:['D','T','D','T','D','T','C','T'],claps:true},
+  ahidous: {name:'أحيدوس',bpm:112,scale:[0,3,5,7,10,12,15,17],lead:'lotar',drum:['B',0,'B','B',0,'B','C',0],claps:true},
+  gnawa:   {name:'كناوة',bpm:104,scale:[0,3,5,7,10,12,15],lead:'flute',bass:[0,-1,0,3,-1,0,5,3, 0,-1,0,3,-1,7,5,3],drum:['Q','Q','Q','Q','Q','Q','Q','Q'],sparse:.6},
+  ahwach:  {name:'أحواش',bpm:100,scale:[0,2,5,7,9,12,14],lead:'flute',drum:['B',0,'C','B','B',0,'C',0],claps:true},
+  rrways:  {name:'الروايس',bpm:118,scale:[0,3,5,7,10,12,15,17],lead:'ribab',drum:['D','N','T','N','D','N','T','N']},
+  hassani: {name:'الموسيقى الحسانية',bpm:92,scale:[0,1,3,5,7,8,10,12,13],lead:'tidinit',drum:['L',0,0,'L','L',0,'C',0],claps:true},
+};
+const REGION_STYLE=['andalusi','rai','malhoun','rbati','chaabi','ahidous','gnawa','ahwach','rrways','hassani','hassani','hassani'];
+const HIJAZ_PHRASES=[
+  [4,-1,3,2,1,-1,0,-1, 1,2,3,-1,2,1,0,-1],[0,1,2,-1,3,4,-1,3, 2,-1,1,2,1,-1,0,-1],
+  [4,5,4,3,4,-1,2,-1, 3,2,1,-1,2,1,0,-1],[7,-1,6,5,4,-1,5,4, 3,-1,2,1,2,-1,0,-1],
+  [0,-1,0,1,2,-1,2,3, 4,-1,3,-1,2,1,1,0],[4,4,5,-1,6,5,4,-1, 7,8,7,6,5,-1,4,-1],[2,3,4,3,2,1,2,-1, 1,0,1,2,1,-1,0,-1],
+];
+function makePhrases(st){
+  if(st.fixed)return HIJAZ_PHRASES;
+  const L=st.scale.length, out=[];
+  for(let p=0;p<6;p++){
+    let d=Math.floor(Math.random()*Math.min(5,L)); const ph=[];
+    for(let i=0;i<16;i++){
+      if(i===15||(i%2===1&&Math.random()<(st.sparse||.3))){ph.push(-1);continue}
+      d=Math.max(0,Math.min(L-1,d+[-2,-1,-1,0,1,1,2][Math.floor(Math.random()*7)]));
+      if(i>=13)d=Math.max(0,d-1);
+      ph.push(d);
+    }
+    ph[14]=0;out.push(ph);
+  }
+  return out;
+}
+const BPM_DEF=108;
+const MUS={step:0,next:0,timer:null,style:STYLES.menu,styleId:'menu',phrases:HIJAZ_PHRASES,phrase:HIJAZ_PHRASES[0]};
+function setMusicStyle(id){
+  if(MUS.styleId===id)return;
+  MUS.styleId=id;MUS.style=STYLES[id]||STYLES.menu;MUS.phrases=makePhrases(MUS.style);MUS.step=0;
+}
+function startMusic(){
+  MUS.next=AC.currentTime+.1;MUS.step=0;
+  MUS.timer=setInterval(()=>{
+    const STEP=60/MUS.style.bpm/2;
+    while(MUS.next<AC.currentTime+.2){playStep(MUS.step,MUS.next,STEP);MUS.next+=STEP;MUS.step++}
+  },40);
+}
+function playStep(s,t,STEP){
+  const st=MUS.style, i=s%16;
+  if(i===0)MUS.phrase=pick(MUS.phrases);
+  const dr=st.drum[s%8];
+  if(dr==='D')doum(t,120);else if(dr==='L')doum(t,75,.7);else if(dr==='B')bendir(t);
+  else if(dr==='T')tek(t,1);else if(dr==='N')naqus(t);else if(dr==='C')clap(t);
+  else if(dr==='Q'){qraqeb(t,i%2?0.6:1);qraqeb(t+STEP*.5,.45)}
+  else if(Math.random()<.25)tek(t,.4);
+  if(st.claps&&s%16===12)clap(t);
+  if(st.riqq&&s%8===0&&Math.random()<st.riqq)riqq(t);
+  if(st.bass){const b=st.bass[i];if(b>=0)guembri(NOTE(st.scale[0]+b-24+5),t,STEP*1.6)}
+  const n=MUS.phrase[i];
+  if(n>=0&&!(AUD.mode==='game'&&i%2===1&&Math.random()<.5)){
+    const f=NOTE(st.scale[n]), inst=(st.lead2&&Math.floor(s/32)%2)?st.lead2:st.lead;
+    INSTR[inst](f,t,STEP*(inst==='violin'||inst==='flute'||inst==='ribab'?1.9:2.2));
+  }
+  if(s%32===0){drone(NOTE(st.scale[0])/4,t,STEP*32);drone(NOTE(st.scale[0]+7)/4,t,STEP*32)}
+}
+function voiceOut(node,g){node.connect(g);g.connect(AUD.music)}
+function pluck(f,t,d,bright=7,vol=.2){
+  const o=AC.createOscillator(),o2=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain(),g2=AC.createGain();
+  o.type='sawtooth';o2.type='triangle';
+  o.frequency.setValueAtTime(f*.97,t);o.frequency.linearRampToValueAtTime(f,t+.025);o2.frequency.value=f*2.004;
+  lp.type='lowpass';lp.Q.value=5;lp.frequency.setValueAtTime(f*bright,t);lp.frequency.exponentialRampToValueAtTime(f*1.3,t+d);
+  g2.gain.value=.25;env(g,t,vol,.004,d);
+  o.connect(lp);o2.connect(g2);g2.connect(lp);voiceOut(lp,g);
+  o.start(t);o2.start(t);o.stop(t+d+.05);o2.stop(t+d+.05);
+}
+function bowed(f,t,d,type,filt,vol){
+  const o=AC.createOscillator(),lfo=AC.createOscillator(),lg=AC.createGain(),fl=AC.createBiquadFilter(),g=AC.createGain();
+  o.type=type;o.frequency.value=f;lfo.frequency.value=5.5;lg.gain.value=f*.012;lfo.connect(lg);lg.connect(o.frequency);
+  fl.type=filt[0];fl.frequency.value=filt[1];fl.Q.value=filt[2];
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.06);g.gain.setValueAtTime(vol,t+d*.6);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(fl);voiceOut(fl,g);o.start(t);lfo.start(t);o.stop(t+d+.05);lfo.stop(t+d+.05);
+}
+const INSTR={
+  oud:(f,t,d)=>pluck(f,t,d),
+  lotar:(f,t,d)=>pluck(f,t,d*.8,10,.22),
+  tidinit:(f,t,d)=>pluck(f*2,t,d*.7,12,.16),
+  violin:(f,t,d)=>bowed(f*2,t,d,'sawtooth',['lowpass',2600,1],.06),
+  ribab:(f,t,d)=>bowed(f*2,t,d,'square',['bandpass',1300,2.5],.07),
+  flute:(f,t,d)=>{
+    bowed(f*2,t,d,'sine',['lowpass',4000,.5],.12);
+    const s=noiseSrc(t,d),bp=AC.createBiquadFilter(),g=AC.createGain();
+    bp.type='bandpass';bp.frequency.value=f*4;bp.Q.value=3;env(g,t,.02,.03,d);s.connect(bp);voiceOut(bp,g);
+  },
+};
+function guembri(f,t,d){
+  const o=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain();
+  o.type='triangle';o.frequency.setValueAtTime(f*1.03,t);o.frequency.exponentialRampToValueAtTime(f,t+.04);
+  lp.type='lowpass';lp.frequency.value=700;env(g,t,.35,.005,d);o.connect(lp);voiceOut(lp,g);o.start(t);o.stop(t+d+.05);
+}
+function doum(t,f=120,v=1){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.43,t+.25);
+  env(g,t,.55*v,.004,.32);voiceOut(o,g);o.start(t);o.stop(t+.4);
+}
+function bendir(t){
+  doum(t,95,.8);
+  const s=noiseSrc(t,.2),bp=AC.createBiquadFilter(),g=AC.createGain();   // snare buzz
+  bp.type='bandpass';bp.frequency.value=900;bp.Q.value=1;env(g,t,.1,.003,.15);s.connect(bp);voiceOut(bp,g);
+}
+function tek(t,v){
+  const s=noiseSrc(t,.08),hp=AC.createBiquadFilter(),g=AC.createGain();
+  hp.type='bandpass';hp.frequency.value=3200;hp.Q.value=1.2;env(g,t,.35*v,.002,.06);s.connect(hp);voiceOut(hp,g);
+}
+function clap(t){
+  [0,.012,.024].forEach(o=>{const s=noiseSrc(t+o,.06),bp=AC.createBiquadFilter(),g=AC.createGain();
+    bp.type='bandpass';bp.frequency.value=1500;bp.Q.value=.8;env(g,t+o,.25,.001,.05);s.connect(bp);voiceOut(bp,g)});
+}
+function qraqeb(t,v){ // Gnawa metal castanets
+  const s=noiseSrc(t,.07),hp=AC.createBiquadFilter(),g=AC.createGain();
+  hp.type='highpass';hp.frequency.value=5000;env(g,t,.16*v,.001,.05);s.connect(hp);voiceOut(hp,g);
+}
+function naqus(t){ // Souss metal plate
+  [1,2.7].forEach((m,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=1800*m;
+    env(g,t,i?.015:.04,.002,.12);voiceOut(o,g);o.start(t);o.stop(t+.15)});
+}
+function riqq(t){
+  const s=noiseSrc(t,.25),hp=AC.createBiquadFilter(),g=AC.createGain();
+  hp.type='highpass';hp.frequency.value=7000;env(g,t,.12,.005,.2);s.connect(hp);voiceOut(hp,g);
+}
+function drone(f,t,d){
+  const o=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain();
+  o.type='triangle';o.frequency.value=f;lp.type='lowpass';lp.frequency.value=500;
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.05,t+1);g.gain.setValueAtTime(.05,t+d-1);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(lp);voiceOut(lp,g);o.start(t);o.stop(t+d+.05);
+}
+
+/* ---- restaurant crowd: murmur + chatter + laughs + glasses + tea pouring ---- */
+const VOWELS=[[800,1200],[300,2300],[350,800],[500,1800],[650,1100]];
+const AMB={on:false,timer:null,murmur:null,talkers:[]};
+function startAmb(){
+  if(AMB.on||!AC)return; AMB.on=true;
+  const s=AC.createBufferSource();s.buffer=AUD.noise;s.loop=true;
+  const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=450;bp.Q.value=.7;
+  const g=AC.createGain();g.gain.value=.05;
+  const lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=.23;lg.gain.value=.02;lfo.connect(lg);lg.connect(g.gain);
+  s.connect(bp);bp.connect(g);g.connect(AUD.amb);s.start();lfo.start();
+  AMB.murmur=[s,lfo];
+  AMB.talkers=Array.from({length:5},()=>({f:Math.random()<.5?100+Math.random()*40:190+Math.random()*60,
+    pan:Math.random()*1.6-.8,vol:.03+Math.random()*.03,next:AC.currentTime+Math.random()*2}));
+  AMB.timer=setInterval(ambTick,90);
+}
+function stopAmb(){
+  if(!AMB.on)return;AMB.on=false;clearInterval(AMB.timer);
+  try{AMB.murmur.forEach(n=>n.stop())}catch(e){}
+}
+function ambTick(){
+  const t=AC.currentTime;
+  AMB.talkers.forEach(k=>{
+    if(t<k.next)return;
+    let tt=t+.02;
+    if(Math.random()<.06){ // laugh
+      for(let i=0;i<5;i++){syllable(k,tt,.09,k.f*(1.6-i*.08),[800,1200],1.3);tt+=.14}
+    }else{
+      const n=2+Math.floor(Math.random()*5);
+      for(let i=0;i<n;i++){const d=.07+Math.random()*.12;syllable(k,tt,d,k.f*(.9+Math.random()*.3),pick(VOWELS),1);tt+=d+.02+Math.random()*.05}
+    }
+    k.next=tt+.3+Math.random()*2.2;
+  });
+  if(Math.random()<.025)clink(t+Math.random()*.1);
+  if(Math.random()<.006)pour(t);
+}
+function syllable(k,t,d,f,[f1,f2],loud){
+  const o=AC.createOscillator(),a=AC.createBiquadFilter(),b=AC.createBiquadFilter(),g=AC.createGain(),p=AC.createStereoPanner?AC.createStereoPanner():null;
+  o.type='sawtooth';o.frequency.setValueAtTime(f,t);o.frequency.linearRampToValueAtTime(f*(.92+Math.random()*.16),t+d);
+  a.type='bandpass';a.frequency.value=f1;a.Q.value=6;b.type='bandpass';b.frequency.value=f2;b.Q.value=9;
+  env(g,t,k.vol*loud,.02,d);
+  o.connect(a);o.connect(b);a.connect(g);b.connect(g);
+  if(p){p.pan.value=k.pan;g.connect(p);p.connect(AUD.amb)}else g.connect(AUD.amb);
+  o.start(t);o.stop(t+d+.05);
+}
+function clink(t){
+  const f=2400+Math.random()*1800;
+  [1,2.76].forEach((m,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f*m;
+    env(g,t,i?.012:.03,.002,.35);o.connect(g);g.connect(AUD.ambDry);o.start(t);o.stop(t+.4)});
+}
+function pour(t){ // tea poured from high
+  const s=noiseSrc(t,1.6),bp=AC.createBiquadFilter(),g=AC.createGain();
+  bp.type='bandpass';bp.Q.value=4;bp.frequency.setValueAtTime(1500,t);bp.frequency.linearRampToValueAtTime(3200,t+1.5);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.05,t+.15);g.gain.setValueAtTime(.05,t+1.3);g.gain.exponentialRampToValueAtTime(.0001,t+1.6);
+  s.connect(bp);bp.connect(g);g.connect(AUD.ambDry);
+}
+document.addEventListener('pointerdown',initAudio);
+
+/* ---- customer voices (recorded with Gemini TTS) ---- */
+const VOICE={q:[],cur:null};
+function say(vid,clip,urgent){
+  if(!AUD.vol.voices.on||!vid)return;
+  const a=new Audio(`voices/${vid}/${clip}.mp3`);a.volume=volOf('voices');
+  if(urgent){VOICE.q.unshift(a)}else VOICE.q.push(a);
+  if(VOICE.q.length>2)VOICE.q.length=2;
+  if(!VOICE.cur)nextVoice();
+}
+function nextVoice(){
+  const a=VOICE.q.shift();
+  if(!a){VOICE.cur=null;duck(false);return}
+  VOICE.cur=a;duck(true);
+  a.onended=a.onerror=()=>nextVoice();
+  a.play().catch(()=>nextVoice());
+}
+function stopVoices(){VOICE.q=[];if(VOICE.cur){VOICE.cur.onended=null;VOICE.cur.pause();VOICE.cur=null}duck(false)}
+function duck(on){
+  if(!AC)return;
+  const base=AUD.mode==='game'?.32:.6;
+  AUD.music.gain.setTargetAtTime(on?base*.35:base,AC.currentTime,.15);
+  AUD.amb.gain.setTargetAtTime(on?.45:(AUD.mode==='game'?1:0),AC.currentTime,.15);
+}
+
+/* ================= SFX ================= */
+function beep(f=600,d=.12,type='sine',v=.15){
+  try{
+    if(!AC)return;
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type=type;o.frequency.value=f;g.gain.value=v;
+    o.connect(g);g.connect(AUD.sfxBus);
+    g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);
+    o.start();o.stop(AC.currentTime+d);
+  }catch(e){}
+}
+const sfx={
+  pick:()=>beep(700,.06,'triangle',.1),
+  cook:()=>beep(220,.2,'sawtooth',.06),
+  ready:()=>{beep(880,.1);setTimeout(()=>beep(1175,.15),110)},
+  coin:()=>{beep(1300,.08,'square',.06);setTimeout(()=>beep(1700,.12,'square',.06),80)},
+  bad:()=>beep(160,.3,'sawtooth',.12),
+  burn:()=>beep(110,.4,'square',.08),
+  fanfare:()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle',.12),i*130)),
+};
+
+/* ================= STORAGE ================= */
+function loadSave(){try{return JSON.parse(localStorage.getItem('matbakh2_save'))}catch(e){return null}}
+function save(){try{localStorage.setItem('matbakh2_save',JSON.stringify(G))}catch(e){}}
+function getRec(){try{return JSON.parse(localStorage.getItem('matbakh2_rec'))||{owned:1,money:0}}catch(e){return{owned:1,money:0}}}
+function updRec(){const r=getRec();r.owned=Math.max(r.owned,G.owned);r.money=Math.max(r.money,G.bank);
+  try{localStorage.setItem('matbakh2_rec',JSON.stringify(r))}catch(e){}}
+
+/* ================= HELPERS ================= */
+const g=(m,f)=>G&&G.gender==='f'?f:m;
+const chefName=()=>`${g('الشاف','الشافة')} ${G.name}`;
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2000)}
+function floatText(t,el,color){
+  const r=el.getBoundingClientRect(),f=document.createElement('div');
+  f.className='float';f.textContent=t;f.style.left=(r.left+r.width/2-30)+'px';f.style.top=(r.top+20)+'px';
+  if(color)f.style.color=color;
+  document.body.appendChild(f);setTimeout(()=>f.remove(),1000);
+}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const menu=()=>REGIONS[G.cur].dishes;
+const target=()=>70+G.cur*30+Math.min(G.rdays[G.cur],4)*10;
+const diff=()=>G.cur*.8+Math.min(G.rdays[G.cur],5)*.4;
+function applyG(){const f=G&&G.gender==='f'?1:0;document.querySelectorAll('[data-g]').forEach(e=>{const v=e.dataset.g.split('|');if(v.length===2)e.textContent=v[f]})}
+function showScr(id){applyG();document.querySelectorAll('.overlay').forEach(o=>o.classList.toggle('hidden',o.id!==id))}
+function msg(icon,title,html,btn,cb){
+  $('#msgIcon').textContent=icon;$('#msgTitle').textContent=title;$('#msgTxt').innerHTML=html;
+  $('#msgBtn').textContent=btn;$('#msgBtn').onclick=cb;showScr('msgScr');
+}
+
+/* ================= KITCHEN SETUP ================= */
+function newDayState(){
+  S={money:0,tips:0,cost:0,hearts:3,served:0,angry:0,burnt:0,wrong:0,dishes:{},
+     board:[],hand:null,time:0,spawnT:1.5,customers:[null,null,null],
+     stoves:[{st:'empty'},{st:'empty'}]};
+  buildIngs();buildBook();renderAll();
+}
+function buildIngs(){
+  const need=new Set(menu().flatMap(d=>R[d].ing));
+  $('#ings').innerHTML=Object.entries(ING).filter(([k])=>need.has(k)).map(([k,[e,n]])=>
+    `<div class="ing" data-k="${k}"><b>${e}</b><small>${n}</small></div>`).join('');
+}
+function buildBook(){
+  $('#bookTitle').textContent=`منيو المطعم ديال ${REGIONS[G.cur].city} 📖`;
+  $('#book').innerHTML=menu().map(id=>{const r=R[id];
+    return `<div class="rec"><div class="h">${r.icon} ${r.name} <span style="color:var(--muted);font-weight:700">· ${r.price} درهم</span></div>
+      <div class="e">${r.ing.map(i=>ING[i][0]).join(' ')}</div></div>`}).join('');
+}
+
+/* ================= RENDER ================= */
+function renderAll(){renderStats();renderBoard();renderHand();renderCustomers(true);renderStoves(true)}
+function renderStats(){
+  const net=S.money-S.cost, tg=target(), bar=$('#goalBar');
+  $('#chefTitle').textContent=`${G.avatar} ${chefName()}`;
+  $('#city').textContent=REGIONS[G.cur].city;$('#day').textContent='النهار '+(G.rdays[G.cur]+1);
+  $('#money').textContent=net;$('#target').textContent=tg;$('#bank').textContent=G.bank;
+  bar.style.width=Math.max(0,Math.min(100,net/tg*100))+'%';bar.classList.toggle('done',net>=tg);
+  $('#hearts').textContent='❤️'.repeat(Math.max(0,S.hearts))+'🖤'.repeat(3-Math.max(0,S.hearts));
+}
+function renderBoard(){
+  $('#boardItems').innerHTML=S.board.length?S.board.map(k=>`<span data-k="${k}" title="${ING[k][1]}">${ING[k][0]}</span>`).join('')
+    :'<small style="font-size:13px;opacity:.85">الطبلة خاوية…</small>';
+  document.querySelectorAll('.ing').forEach(el=>el.classList.toggle('on',S.board.includes(el.dataset.k)));
+}
+function renderHand(){
+  const h=$('#hand');
+  if(S.hand){h.innerHTML=`✋ فيديك: ${R[S.hand].icon} <b>${R[S.hand].name}</b> — عطيها للكليان اللي طلبها!`;h.classList.add('has')}
+  else{h.textContent='✋ يديك خاويين';h.classList.remove('has')}
+}
+function renderCustomers(full){
+  const box=$('#customers');
+  if(full||box.children.length!==3){
+    box.innerHTML='';
+    S.customers.forEach((c,i)=>{
+      const d=document.createElement('div');d.className='cust'+(c?' full':'');d.dataset.i=i;
+      if(c){
+        const r=R[c.dish];
+        d.innerHTML=`<div class="face">${c.face}</div><div class="name">${c.name}</div>
+          <div class="bubble">${c.line}<span class="dish">${r.icon}</span>${r.name}${c.suf}</div>
+          <div class="hint" title="الإرشاد">💡 ${r.ing.map(i=>ING[i][0]).join('')}</div>
+          <div class="pat"><i></i></div>`;
+      }else d.innerHTML='<div class="empty-txt">🪑 بلاصة خاوية</div>';
+      box.appendChild(d);
+    });
+  }
+  S.customers.forEach((c,i)=>{
+    const d=box.children[i];
+    d.classList.toggle('target',!!(c&&S.hand&&S.hand===c.dish));
+    if(c){
+      const p=Math.max(0,c.pat/c.max), bar=d.querySelector('.pat i');
+      bar.style.width=(p*100)+'%';
+      bar.style.background=p>.5?'var(--green)':p>.25?'var(--gold)':'var(--red)';
+      const face=d.querySelector('.face'), f=p<.25?'😡':c.face; if(face.textContent!==f)face.textContent=f;
+    }
+  });
+}
+function renderStoves(full){
+  document.querySelectorAll('.stove').forEach((el,i)=>{
+    const s=S.stoves[i], key=s.st+(s.dish||'');
+    if(full||el.dataset.key!==key){
+      el.dataset.key=key;el.className='stove '+s.st;
+      let pot='🍳',lbl='كانون خاوي — كليكي باش تطيب';
+      if(s.st==='cooking'){pot=R[s.dish].icon;lbl='كيطيب: '+R[s.dish].name}
+      if(s.st==='ready'){pot=R[s.dish].icon;lbl='✅ واجد! كليكي باش تهزو'}
+      if(s.st==='burnt'){pot='💨';lbl='🔥 تحرق! كليكي باش تنقيه'}
+      el.innerHTML=`<div class="fire">🔥🔥🔥</div><div class="pot">${pot}</div><div class="lbl">${lbl}</div>
+        <div class="bar ${s.st==='cooking'||s.st==='ready'?'':'hidden'}"><i></i></div>`;
+    }
+    const bar=el.querySelector('.bar i');
+    if(s.st==='cooking')bar.style.width=(s.t/R[s.dish].time*100)+'%';
+    if(s.st==='ready'){bar.style.width=(100-s.t/BURN*100)+'%';el.classList.toggle('warn',s.t>BURN-2.5)}
+  });
+}
+
+/* ================= KITCHEN ACTIONS ================= */
+$('#ings').addEventListener('click',e=>{
+  const el=e.target.closest('.ing'); if(!el||!running)return;
+  const k=el.dataset.k, idx=S.board.indexOf(k);
+  if(idx>=0)S.board.splice(idx,1);
+  else{ if(S.board.length>=5){toast('الطبلة عامرة! (٥ عناصر بزاف)');sfx.bad();return} S.board.push(k)}
+  sfx.pick();renderBoard();
+});
+$('#boardItems').addEventListener('click',e=>{
+  const el=e.target.closest('span[data-k]'); if(!el||!running)return;
+  S.board.splice(S.board.indexOf(el.dataset.k),1);sfx.pick();renderBoard();
+});
+$('#clearBtn').onclick=()=>{if(!running)return;S.board=[];renderBoard()};
+$('#trashBtn').onclick=()=>{if(!running)return;if(S.hand){S.hand=null;sfx.bad();renderHand();renderCustomers()}else toast('ما فيديك والو باش تلوح')};
+
+document.querySelectorAll('.stove').forEach(el=>el.addEventListener('click',()=>{
+  if(!running)return;
+  const i=+el.dataset.i, s=S.stoves[i];
+  if(s.st==='empty'){
+    if(!S.board.length){toast(g('حط','حطي')+' شي عناصر فالطبلة لول 🧺');return}
+    const set=[...S.board].sort().join();
+    const id=menu().find(d=>[...R[d].ing].sort().join()===set);
+    if(!id){toast('هادي ماشي وصفة من المنيو 🤔 '+g('شوف','شوفي')+' الإرشاد 💡');sfx.bad();return}
+    const c=Math.round(R[id].price*.3);
+    S.cost+=c;floatText(`-${c} 🧺`,el,'var(--red)');
+    S.stoves[i]={st:'cooking',dish:id,t:0};
+    S.board=[];sfx.cook();renderBoard();renderStats();
+  }else if(s.st==='cooking'){toast(g('صبر','صبري')+' شوية، باقي كيطيب ⏳')}
+  else if(s.st==='ready'){
+    if(S.hand){toast('يديك عامرين! '+g('عطي','عطيي')+' اللي فيديك لول');return}
+    S.hand=s.dish;S.stoves[i]={st:'empty'};sfx.pick();renderHand();renderCustomers();
+  }else if(s.st==='burnt'){S.stoves[i]={st:'empty'};sfx.pick()}
+  renderStoves();
+}));
+
+$('#customers').addEventListener('click',e=>{
+  const el=e.target.closest('.cust'); if(!el||!running)return;
+  const i=+el.dataset.i, c=S.customers[i];
+  if(!c)return;
+  if(!S.hand){toast(`${c.name} باغي ${R[c.dish].name} ${R[c.dish].icon}`);return}
+  if(S.hand!==c.dish){toast(`${c.name}: ماشي هادا اللي طلبت! 😠`);sfx.bad();say(c.vid,'wrong',true);S.wrong++;c.pat-=c.max*.25;return}
+  say(c.vid,'thanks',true);
+  const r=R[c.dish], tip=Math.round(c.pat/c.max*10);
+  S.money+=r.price+tip;S.tips+=tip;S.served++;S.dishes[c.dish]=(S.dishes[c.dish]||0)+1;
+  S.hand=null;S.customers[i]=null;
+  floatText(`+${r.price+tip} 💰`,el);sfx.coin();
+  renderStats();renderHand();renderCustomers(true);
+});
+
+/* ================= TUTORIAL ================= */
+function showTutorial(id){
+  const r=R[id];
+  running=false;paused=true;
+  $('#tutIcon').textContent=r.icon;$('#tutName').textContent=r.name;$('#tutDesc').textContent=r.desc;
+  $('#tutChips').innerHTML=r.ing.map(i=>`<div class="chip"><b>${ING[i][0]}</b>${ING[i][1]}</div>`).join('<div class="plus">+</div>');
+  $('#tutInfo').innerHTML=`ومن بعد ${g('طيبها','طيبيها')} فالكانون 🔥 ${r.time} ثواني · 💰 ${r.price} درهم`;
+  $('#tutGo').onclick=()=>{
+    G.seen.push(id);save();paused=false;showScr(null);
+    running=true;last=performance.now();requestAnimationFrame(tick);
+  };
+  showScr('tutScr');
+}
+
+/* ================= LOOP ================= */
+function spawn(){
+  const free=S.customers.map((c,i)=>c?-1:i).filter(i=>i>=0);
+  if(!free.length)return;
+  const busy=S.customers.filter(Boolean).map(c=>c.vid);
+  const pool=PEOPLE.filter(p=>!busy.includes(p[2]));
+  const [face,name,vid,line,suf]=pick(pool.length?pool:PEOPLE), id=pick(menu()), r=R[id];
+  const max=Math.max(22,50-diff()*2.5)+r.time*2;
+  S.customers[pick(free)]={face,name,vid,dish:id,pat:max,max,line,suf};
+  beep(520,.08,'triangle',.08);
+  say(vid,id);
+  renderCustomers(true);
+  if(!G.seen.includes(id))showTutorial(id);
+}
+function tick(now){
+  if(!running)return;
+  const dt=Math.min(.1,(now-last)/1000);last=now;
+  S.time+=dt;
+  const m=Math.floor(540*Math.min(1,S.time/DAY_LEN)), clk=$('#clock');
+  clk.textContent=String(9+Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+  clk.style.color=DAY_LEN-S.time<15?'#ffd27a':'';
+  if(S.time>=DAY_LEN){endDay(false);return}
+  S.spawnT-=dt;
+  if(S.spawnT<=0&&DAY_LEN-S.time>8){spawn();S.spawnT=Math.max(3.2,9.5-diff()*.5)*(0.8+Math.random()*.4)}
+  if(!running)return; // tutorial opened
+  S.customers.forEach((c,i)=>{
+    if(!c)return;
+    c.pat-=dt;
+    if(c.pat<=0){
+      S.customers[i]=null;S.hearts--;S.angry++;sfx.bad();say(c.vid,'angry',true);
+      toast(`${c.name} مشا معصب 😤`);renderStats();renderCustomers(true);
+    }
+  });
+  if(S.hearts<=0){endDay(true);return}
+  S.stoves.forEach((s,i)=>{
+    if(s.st==='cooking'){s.t+=dt;if(s.t>=R[s.dish].time){S.stoves[i]={st:'ready',dish:s.dish,t:0};sfx.ready()}}
+    else if(s.st==='ready'){s.t+=dt;if(s.t>=BURN){S.stoves[i]={st:'burnt'};S.burnt++;sfx.burn();toast('أويلي! الماكلة تحرقات 🔥')}}
+  });
+  renderCustomers();renderStoves();
+  if(running)requestAnimationFrame(tick);
+}
+
+/* ================= MAP ================= */
+const PX=([lo,la])=>[+((lo+17.6)*30).toFixed(1),+((36.2-la)*30).toFixed(1)];
+let selReg=0;
+function regPts(i){return REGIONS[i].poly.split(' ').map(n=>PX(PT[n]))}
+function regState(i){return i<G.owned?'own':i===G.owned?'next':'lock'}
+function showMap(sel){
+  running=false;selReg=sel??G.cur;setAudioMode('menu',REGION_STYLE[selReg]);
+  $('#mBank').textContent=G.bank;$('#mOwned').textContent=G.owned;$('#mDays').textContent=G.days;
+  drawMap();regInfo();showScr('mapScr');
+}
+function drawMap(){
+  let s=`<svg viewBox="0 -24 500 484" xmlns="http://www.w3.org/2000/svg">
+    <text x="420" y="-6" class="sea">البحر الأبيض المتوسط</text>
+    <text x="110" y="190" class="sea">المحيط</text><text x="110" y="208" class="sea">الأطلسي</text>`;
+  REGIONS.forEach((r,i)=>{
+    const st=regState(i), d='M'+regPts(i).map(p=>p.join(',')).join('L')+'Z';
+    s+=`<path class="reg ${st==='next'?'next':''}" data-r="${i}" d="${d}" ${st==='own'?`style="fill:${r.color}"`:''}/>`;
+  });
+  s+=`<path class="selline" d="M${regPts(selReg).map(p=>p.join(',')).join('L')}Z"/>`;
+  REGIONS.forEach((r,i)=>{
+    const pts=regPts(i), cx=pts.reduce((a,p)=>a+p[0],0)/pts.length, cy=pts.reduce((a,p)=>a+p[1],0)/pts.length;
+    const st=regState(i);
+    if(st==='own')s+=`<text class="remo" x="${cx}" y="${cy-15}">🏪</text>`;
+    if(st==='lock')s+=`<text class="remo" x="${cx}" y="${cy-14}" style="font-size:11px">🔒</text>`;
+    s+=`<circle class="rdot" cx="${cx}" cy="${cy}" r="9"/><text class="rnum" x="${cx}" y="${cy+1}">${i+1}</text>`;
+  });
+  $('#map').innerHTML=s+'</svg>';
+  $('#map').querySelectorAll('.reg').forEach(p=>p.addEventListener('click',()=>{selReg=+p.dataset.r;setMusicStyle(REGION_STYLE[selReg]);drawMap();regInfo();beep(600,.05,'triangle',.08)}));
+  $('#rlist').innerHTML=REGIONS.map((r,i)=>{const st=regState(i);
+    return `<span data-r="${i}" class="${st==='own'?'own':st==='next'?'nx':''}">${i+1}. ${r.city}</span>`}).join('');
+  $('#rlist').querySelectorAll('span').forEach(sp=>sp.onclick=()=>{selReg=+sp.dataset.r;setMusicStyle(REGION_STYLE[selReg]);drawMap();regInfo()});
+}
+function regInfo(){
+  const i=selReg, r=REGIONS[i], st=regState(i);
+  let html=`<div style="font-size:13px;color:var(--muted);font-weight:700">الجهة ${i+1} من 12</div><h2>${r.name}</h2>`;
+  html+=st==='own'?`<span class="status st-own">✅ عندك مطعم فـ${r.city}</span>`:
+        st==='next'?`<span class="status st-next">🛒 مطعم للبيع: ${r.price} درهم</span>`:
+        `<span class="status st-lock">🔒 خاصك تشري الجهة اللي قبل</span>`;
+  html+=`<div style="margin-top:6px;font-weight:700;color:var(--muted)">الماكلة ديال الجهة:</div>`;
+  html+=r.dishes.map(d=>`<div class="rdish"><b>${R[d].icon}</b>${R[d].name}<span style="margin-inline-start:auto;color:var(--muted)">${R[d].price} د</span></div>`).join('');
+  html+='<div class="btns">';
+  if(st==='own')html+=`<button class="btn go" id="playBtn">▶ ${g('خدم','خدمي')} فـ${r.city}${G.rdays[i]?` (النهار ${G.rdays[i]+1})`:''}</button>`;
+  if(st==='next'){
+    const can=G.bank>=r.price;
+    html+=`<button class="btn buy" id="buyBtn" ${can?'':'disabled'}>🛒 ${g('شري','شريي')} المطعم بـ ${r.price} درهم</button>`;
+    if(!can)html+=`<div style="text-align:center;font-weight:700;color:var(--red)">خاصك ${r.price-G.bank} درهم كثر 💪</div>`;
+  }
+  html+='</div>';
+  $('#regInfo').innerHTML=html;
+  if($('#playBtn'))$('#playBtn').onclick=()=>{G.cur=i;save();dayIntro()};
+  if($('#buyBtn'))$('#buyBtn').onclick=()=>buy(i);
+}
+function buy(i){
+  const r=REGIONS[i];
+  if(G.bank<r.price||i!==G.owned)return;
+  G.bank-=r.price;G.owned++;G.cur=i;save();updRec();sfx.fanfare();
+  if(G.owned===REGIONS.length){
+    msg('👑','مبروك يا '+chefName()+'!',
+      `شريتي مطاعم فالـ12 جهة ديال المغرب كاملين، من طنجة حتى للكويرة! 🇲🇦<br>وليتي ${g('أكبر طباخ','أكبر طباخة')} فالبلاد 🏆<br>`+
+      `📅 فـ ${G.days} نهار · 🏦 باقي فالصندوق ${G.bank} درهم<br>تقدر تبقى تخدم فأي مطعم بغيتي.`,
+      g('شوف','شوفي')+' الخريطة 🗺️',()=>showMap(i));
+    return;
+  }
+  msg('🏪','مطعم جديد فـ'+r.city+'!',
+    `مبروك! وليتي ${g('مول','مولات')} مطعم فجهة <b>${r.name}</b> 🎉<br>الماكلة ديال هنا: ${r.dishes.map(d=>R[d].icon+' '+R[d].name).join('، ')}<br>`+
+    `🏦 باقي فالصندوق: ${G.bank} درهم`,'يلاه نخدمو! ▶',()=>dayIntro());
+}
+
+/* ================= DAYS ================= */
+function dayIntro(){
+  running=false;
+  const r=REGIONS[G.cur], d=G.rdays[G.cur]+1, nw=r.dishes.filter(x=>!G.seen.includes(x));
+  newDayState();
+  setAudioMode('region');
+  $('#diTitle').textContent=`📍 ${r.city} — النهار ${d}`;
+  $('#diTxt').innerHTML=`صباح الخير يا ${chefName()}! ${G.avatar}<br>🎯 الهدف ديال اليوم: <b>${target()} درهم</b> ربح صافي<br>`+
+    `🏦 فالصندوق: <b>${G.bank} درهم</b><br>`+
+    (nw.length?`🆕 كاين ماكلة جديدة غادي تتعلمها: ${nw.map(x=>R[x].icon).join(' ')}<br>`:'')+
+    `🎵 الموسيقى ديال الجهة: <b>${STYLES[REGION_STYLE[G.cur]].name}</b><br>`+
+    (G.owned<REGIONS.length?`🛒 المطعم الجاي فـ${REGIONS[G.owned].city}: ${REGIONS[G.owned].price} درهم`:'👑 عندك المطاعم كاملين!');
+  showScr('dayScr');
+}
+function startDay(){
+  newDayState();running=true;showScr(null);setAudioMode('game');
+  last=performance.now();requestAnimationFrame(tick);
+}
+function summaryRows(net,tg){
+  return `<tr><td>🧍 كليان خدمتيهم</td><td>${S.served}</td></tr>
+    <tr><td>😤 مشاو معصبين</td><td>${S.angry}</td></tr>
+    <tr><td>💨 طباسل تحرقو</td><td>${S.burnt}</td></tr>
+    <tr><td>❌ غلطات فالطلبات</td><td>${S.wrong}</td></tr>
+    <tr><td>💵 المدخول</td><td class="pos">+${S.money-S.tips}</td></tr>
+    <tr><td>🪙 البقشيش</td><td class="pos">+${S.tips}</td></tr>
+    <tr><td>🧺 مصاريف السلعة</td><td class="neg">-${S.cost}</td></tr>
+    <tr class="total"><td>💰 الربح الصافي</td><td class="${net>=tg?'pos':'neg'}">${net} / ${tg}</td></tr>`;
+}
+function endDay(closed){
+  running=false;stopVoices();setAudioMode('region');
+  const net=S.money-S.cost, tg=target();
+  const stars=closed?0:net>=tg*2?3:net>=tg*1.5?2:net>=tg?1:0;
+  const dayN=G.rdays[G.cur]+1;
+  G.bank=Math.max(0,G.bank+net);G.days++;G.rdays[G.cur]++;save();updRec();
+  $('#deTitle').textContent=`سالا النهار ${dayN} فـ${REGIONS[G.cur].city}`;
+  $('#deStars').innerHTML=[1,2,3].map(i=>`<span class="${i<=stars?'':'off'}" style="animation-delay:${i*.2}s">⭐</span>`).join('');
+  $('#deMsg').textContent=closed?'😬 مشاو ٣ ديال الكليان معصبين، سديتي بكري اليوم!':
+    ['ما وصلتيش للهدف اليوم… غدا تكون أحسن 💪','مزيان! وصلتي للهدف 👍','واعر! الكليان فرحانين بزاف 😍',`${g('أسطورة','أسطورة')} المطبخ المغربي! 👑`][stars];
+  $('#deTbl').innerHTML=summaryRows(net,tg)+`<tr class="total"><td>🏦 الصندوق</td><td>${G.bank}</td></tr>`;
+  const ds=Object.entries(S.dishes).sort((a,b)=>b[1]-a[1]);
+  $('#deDishes').innerHTML=ds.length?'<b style="font-size:14px">شنو تباع اليوم:</b><br>'+ds.map(([k,n])=>`${R[k].icon}×${n}`).join(' &nbsp; '):'';
+  const nx=REGIONS[G.owned], buy=$('#deBuy');
+  if(nx&&G.bank>=nx.price){buy.innerHTML=`🎉 عندك الفلوس باش تشري مطعم فـ<b>${nx.city}</b> (${nx.price} درهم)! ${g('سير','سيري')} للخريطة 🗺️`;buy.classList.remove('hidden')}
+  else if(nx){buy.innerHTML=`🛒 المطعم الجاي فـ${nx.city}: خاصك ${nx.price-G.bank} درهم كثر`;buy.classList.remove('hidden')}
+  else buy.classList.add('hidden');
+  stars?sfx.ready():sfx.bad();showScr('endScr');
+}
+
+/* ================= MENU & CHARACTER ================= */
+let draft={gender:'f',avatar:AVATARS.f[0]};
+function showMenu(){
+  running=false;setAudioMode('menu');
+  const sv=loadSave()||(G&&G.name?G:null), rec=getRec();
+  $('#contBtn').classList.toggle('hidden',!sv);
+  $('#chefCard').classList.toggle('hidden',!sv);
+  if(sv){
+    G=sv;
+    $('#chefCard').textContent=`${sv.avatar} ${chefName()} · 📍 ${REGIONS[sv.cur].city} · 🏪 ${sv.owned}/12`;
+  }
+  $('#recOwned').textContent=rec.owned;$('#recMoney').textContent=rec.money;
+  showScr('startScr');
+}
+function charRender(){
+  document.querySelectorAll('.gbtn').forEach(b=>b.classList.toggle('on',b.dataset.g===draft.gender));
+  $('#avatars').innerHTML=AVATARS[draft.gender].map(a=>`<button class="av ${a===draft.avatar?'on':''}">${a}</button>`).join('');
+  $('#avatars').querySelectorAll('.av').forEach(b=>b.onclick=()=>{draft.avatar=b.textContent;beep(700,.05,'triangle',.08);charRender()});
+  const nm=$('#nameIn').value.trim()||'…';
+  $('#charPrev').textContent=`${draft.avatar} ${draft.gender==='f'?'الشافة':'الشاف'} ${nm}`;
+}
+document.querySelectorAll('.gbtn').forEach(b=>b.onclick=()=>{
+  draft.gender=b.dataset.g;draft.avatar=AVATARS[draft.gender][0];beep(700,.05,'triangle',.08);charRender();
+});
+$('#nameIn').addEventListener('input',charRender);
+$('#charGo').onclick=()=>{
+  const name=$('#nameIn').value.trim();
+  if(!name){toast('كتب سميتك عافاك ✍️');$('#nameIn').focus();return}
+  G={name,gender:draft.gender,avatar:draft.avatar,owned:1,cur:0,bank:0,days:0,rdays:REGIONS.map(()=>0),seen:[]};
+  save();updRec();
+  msg(G.avatar,`مرحبا بيك يا ${chefName()}!`,
+    `${g('بديتي','بديتي')} بمطعم صغير فـ<b>طنجة</b> 🏪<br>${g('خدم مزيان وجمع','خدمي مزيان وجمعي')} الفلوس باش تشري مطاعم فالجهات ديال المغرب، `+
+    `وحدة بوحدة من الشمال حتى للجنوب 🗺️<br>كل جهة عندها الماكلة ديالها… والهدف: توصل حتى للكويرة! 🦪`,
+    g('شوف','شوفي')+' الخريطة 🗺️',()=>showMap(0));
+};
+$('#newBtn').onclick=()=>{
+  if((loadSave()||(G&&G.name))&&!confirm('غادي تمسح اللعبة القديمة وتبدا من جديد. واش '+g('متأكد','متأكدة')+'؟'))return;
+  draft={gender:'f',avatar:AVATARS.f[0]};$('#nameIn').value='';charRender();showScr('charScr');
+};
+$('#contBtn').onclick=()=>{const sv=loadSave()||(G&&G.name?G:null);if(sv){G=sv;showMap(G.cur)}};
+$('#howBtn').onclick=()=>showScr('howScr');
+$('#diGo').onclick=startDay;
+$('#diMap').onclick=()=>showMap(G.cur);
+$('#deNext').onclick=()=>dayIntro();
+$('#deMap').onclick=()=>showMap(G.cur);
+document.querySelectorAll('[data-menu]').forEach(b=>b.onclick=showMenu);
+
+// boot
+let setWasRunning=false;
+function renderSettings(){
+  document.querySelectorAll('.setrow').forEach(r=>{
+    const v=AUD.vol[r.dataset.k];r.classList.toggle('off',!v.on);
+    const b=r.querySelector('.tog');b.textContent=v.on?'✅ مشعولة':'❌ مطفية';b.classList.toggle('off',!v.on);
+    r.querySelector('input').value=v.v;
+  });
+  $('#nowPlaying').textContent='🎵 الموسيقى دابا: '+(STYLES[MUS.styleId]||STYLES.menu).name;
+}
+function openSettings(){
+  setWasRunning=running; if(running){running=false;stopVoices()}
+  $('#setClose').textContent=setWasRunning?'رجع للعب ✔':'رجع ✔';
+  $('#setQuit').classList.toggle('hidden',!setWasRunning);
+  renderSettings();$('#setScr').classList.remove('hidden');
+}
+function closeSettings(){
+  $('#setScr').classList.add('hidden');
+  if(setWasRunning){setWasRunning=false;running=true;last=performance.now();requestAnimationFrame(tick)}
+}
+document.querySelectorAll('.setrow').forEach(r=>{
+  const k=r.dataset.k;
+  r.querySelector('.tog').onclick=()=>{AUD.vol[k].on=!AUD.vol[k].on;applyVolumes();renderSettings();if(k==='voices'&&!AUD.vol[k].on)stopVoices()};
+  r.querySelector('input').oninput=e=>{AUD.vol[k].v=+e.target.value;AUD.vol[k].on=true;applyVolumes();renderSettings()};
+});
+$('#setBtn').addEventListener('click',e=>{e.stopPropagation();initAudio();openSettings()});
+$('#setClose').onclick=closeSettings;
+$('#setQuit').onclick=()=>{setWasRunning=false;$('#setScr').classList.add('hidden');stopVoices();showMenu()};
+applyVolumes();
+G={name:'',gender:'f',avatar:'👩‍🍳',owned:1,cur:0,bank:0,days:0,rdays:REGIONS.map(()=>0),seen:[]};
+newDayState();showMenu();
+(function loading(){
+  const tips=['كنشعلو الكانون… 🔥','كنقطعو البصلة… 🧅😢','كنحلو الطاجين… 🥘','كنوجدو أتاي… 🫖','كنستقبلو الكليان… 🧍'];
+  const T=3200, t0=performance.now();
+  (function step(now){
+    const p=Math.min(1,(now-t0)/T);
+    $('#ldFill').style.width=(p*100)+'%';
+    $('#ldTip').textContent=p<1?tips[Math.min(tips.length-1,Math.floor(p*tips.length))]:'واجد! بصحتك 😋';
+    if(p<1)requestAnimationFrame(step);
+    else setTimeout(()=>{$('#loadScr').classList.add('gone');setTimeout(()=>$('#loadScr').remove(),700)},400);
+  })(t0);
+})();
+</script>
+</body>
+</html>
