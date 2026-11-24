@@ -418,7 +418,7 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     🧺 كليكي على العناصر باش تحطهم فالطبلة، ومن بعد كليكي على كانون خاوي باش تطيب.<br>
     ✋ ملي توجد الماكلة، <span data-g="هزها وعطيها|هزيها وعطيها">هزها وعطيها</span> للكليان اللي طلبها.<br>
     💨 <span data-g="رد|ردي">رد</span> بالك: الماكلة كتحرق إلا خليتيها فالكانون بزاف!<br>
-    ⏰ النهار من 9:00 حتى 18:00. <span data-g="وصل|وصلي">وصل</span> للهدف باش تاخد النجوم ⭐.<br>
+    ⏰ النهار من 9:00 حتى 18:00. <span data-g="وصل|وصلي">وصل</span> للهدف باش تاخد النجوم ⭐. فـ18:00 كيتسد الباب، ولكن النهار ما كيساليش حتى <span data-g="تعطي|تعطيي">تعطي</span> لآخر كليان الطلب ديالو.<br>
     ❤️ إلا مشاو ٣ ديال الكليان معصبين، كتسد بكري داك النهار.</p>
     <button class="btn go" data-menu>رجع ↩</button>
   </div>
@@ -1116,7 +1116,12 @@ function tick(now){
   const m=Math.floor(540*Math.min(1,S.time/DAY_LEN)), clk=$('#clock');
   clk.textContent=String(9+Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
   clk.style.color=DAY_LEN-S.time<15?'#ffd27a':'';
-  if(S.time>=DAY_LEN){endDay(false);return}
+  if(S.time>=DAY_LEN){
+    // closing time: no new customers, but serve everyone still seated before the day ends
+    if(!S.customers.some(Boolean)){endDay(false);return}
+    if(!S.closing){S.closing=true;toast(`🔒 سدينا الباب! ${g('كمل','كملي')} الكليان اللي بقاو`)}
+    clk.textContent='18:00 🔒';
+  }
   S.spawnT-=dt;
   if(S.spawnT<=0&&DAY_LEN-S.time>8){spawn();S.spawnT=Math.max(3.2,9.5-diff()*.5)*(0.8+Math.random()*.4)}
   if(!running)return; // tutorial opened
