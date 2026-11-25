@@ -188,6 +188,7 @@ header h1{margin:0;font-size:20px;font-weight:900}
 .rst{font-family:inherit;font-weight:700;font-size:13px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 4px;cursor:pointer}
 .rst.on{border-color:var(--teal);background:#e3f4f5;color:var(--teal);box-shadow:0 0 0 2px rgba(42,140,150,.25)}
 .rst:active{transform:translateY(1px)}
+#radioList .rgrp{grid-column:1/-1;font-weight:900;font-size:13px;color:var(--teal);margin-top:4px}
 #radioStat{grid-column:1/-1;font-size:13px;font-weight:700;color:var(--muted)}
 
 /* character */
@@ -910,6 +911,17 @@ const STATIONS=[
   ['agadir','🌅 راديو بلوس أكادير','https://stream-158.zeno.fm/bqdbb6hd0neuv'],
   ['marrakech','🌴 مراكش بلوس','https://cast5.my-control-panel.com/proxy/marrakec/stream'],
   ['skyrock','🎤 سكايروك كازا','https://icecast.skyrock.net/s/casa_aac_64k'],
+  // islamic group (4th field 'isl'): Quran in warsh (the Moroccan reading) first
+  ['qazabri','📖 القزابري (ورش)','https://serverkw.quran-uni.com:8212/;','isl'],
+  ['kouchi','📖 العيون الكوشي (ورش)','https://serverkw.quran-uni.com:8164/;','isl'],
+  ['basitw','📖 عبد الباسط (ورش)','https://serverkw.quran-uni.com:8210/;','isl'],
+  ['husary','📖 الحصري','https://qurango.net/radio/mahmoud_khalil_alhussary','isl'],
+  ['minshawi','📖 المنشاوي','https://radio.mp3islam.com/listen/minshawi/radio.mp3','isl'],
+  ['mishary','📖 مشاري العفاسي','https://radio.mp3islam.com/listen/mishary/radio.mp3','isl'],
+  ['sudais','📖 السديس','https://radio.mp3islam.com/listen/sudais/radio.mp3','isl'],
+  ['qcairo','🕌 إذاعة القرآن الكريم','https://radio.xecod.com/station/quran-cairo','isl'],
+  ['qsharjah','🕌 إذاعة القرآن (الشارقة)','https://l3.itworkscdn.net/smcquranlive/quranradiolive/icecast.audio','isl'],
+  ['tafsir','📚 التفسير','https://qurango.net/radio/tafseer','isl'],
 ];
 const RADIO={id:null,v:.8,last:'medina',want:false,el:null,ducked:false,stat:'',retry:0};
 try{const r=JSON.parse(localStorage.getItem('matbakh_radio'));if(r){RADIO.v=r.v??.8;RADIO.last=r.last||'medina';RADIO.want=!!r.on}}catch(e){}
@@ -946,7 +958,9 @@ function renderRadio(){
   r.classList.toggle('off',!on);
   const b=r.querySelector('.tog');b.textContent=on?'✅ مشعول':'❌ مطفي';b.classList.toggle('off',!on);
   r.querySelector('input').value=RADIO.v;
-  $('#radioList').innerHTML=STATIONS.map(s=>`<button class="rst${s[0]===RADIO.id?' on':''}" data-id="${s[0]}">${s[1]}</button>`).join('');
+  const btn=s=>`<button class="rst${s[0]===RADIO.id?' on':''}" data-id="${s[0]}">${s[1]}</button>`;
+  $('#radioList').innerHTML='<div class="rgrp">🎵 إذاعات مغربية</div>'+STATIONS.filter(s=>!s[3]).map(btn).join('')
+    +'<div class="rgrp">🕌 إسلامي</div>'+STATIONS.filter(s=>s[3]==='isl').map(btn).join('');
   $('#radioStat').textContent=on?RADIO.stat:'ختار إذاعة مغربية وسمع ليها وانت كتطيب 🎧';
   const np=$('#nowPlaying');
   if(np&&!$('#setScr').classList.contains('hidden'))np.textContent=on?'📻 كتسمع دابا: '+stOf(RADIO.id)[1]+' (الموسيقى ديال اللعبة واقفة)':'🎵 الموسيقى دابا: '+(STYLES[MUS.styleId]||STYLES.menu).name;
