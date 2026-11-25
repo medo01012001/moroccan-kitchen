@@ -307,9 +307,14 @@ body.blackout .stove .fire{opacity:.15!important}
 .smoke{position:fixed;font-size:34px;pointer-events:none;z-index:24;animation:smoke 2.2s ease-out both}
 body.blackout.lit #app>.sect{filter:brightness(.82) saturate(.9)}
 @keyframes smoke{0%{opacity:0;transform:translate(0,0) scale(.6)}15%{opacity:.95}100%{opacity:0;transform:translate(var(--dx),-150px) scale(2.2)}}
-#mama{position:absolute;top:-36px;right:8px;font-size:44px;line-height:1;z-index:7;animation:catIn .6s ease-out,catWig .5s .6s infinite alternate;filter:drop-shadow(0 3px 2px rgba(0,0,0,.35));pointer-events:none}
+#mama{position:absolute;top:-36px;right:8px;font-size:44px;line-height:1;z-index:7;animation:mamaIn .6s ease-out,catWig .5s .6s infinite alternate;filter:drop-shadow(0 3px 2px rgba(0,0,0,.35));pointer-events:none}
 #mama small{position:absolute;top:-6px;right:44px;font-size:12px;font-weight:900;background:#fff;color:var(--ink);border:2px solid var(--gold);border-radius:12px;padding:2px 8px;width:max-content;max-width:210px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
-#mama.run{animation:catOut .7s forwards}
+#mama.run{animation:mamaOut .7s forwards}
+@keyframes mamaIn{from{transform:translateX(170px)}}
+@keyframes mamaOut{to{transform:translateX(280px);opacity:0}}
+/* the cat / mama slide in from off-screen: never let that widen the page (it shook the whole screen on phones) */
+html,body{overflow-x:hidden;overflow-x:clip}
+#app{overflow-x:clip}
 #decorRow{display:flex;gap:6px;justify-content:center;font-size:24px;margin:-2px 0 6px;flex-wrap:wrap}
 #decorRow span{animation:hop 1.6s ease-in-out infinite;display:inline-block}
 #decorRow span:nth-child(2n){animation-delay:.4s}
