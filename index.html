@@ -184,6 +184,11 @@ header h1{margin:0;font-size:20px;font-weight:900}
 .tog.off{background:#fde8e6;color:var(--red)}
 .setrow.off input{opacity:.35}
 #nowPlaying{margin-top:10px;font-weight:700;color:var(--muted)}
+#radioList{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.rst{font-family:inherit;font-weight:700;font-size:13px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 4px;cursor:pointer}
+.rst.on{border-color:var(--teal);background:#e3f4f5;color:var(--teal);box-shadow:0 0 0 2px rgba(42,140,150,.25)}
+.rst:active{transform:translateY(1px)}
+#radioStat{grid-column:1/-1;font-size:13px;font-weight:700;color:var(--muted)}
 
 /* character */
 .gender{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
@@ -747,6 +752,8 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     <div class="big">⚙️</div>
     <h1>الإعدادات</h1>
     <div class="setrow" data-k="music"><span class="sl">🎵 الموسيقى</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05"></div>
+    <div class="setrow off" id="radioRow"><span class="sl">📻 الراديو</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05">
+      <div id="radioList"></div><div id="radioStat"></div></div>
     <div class="setrow" data-k="voices"><span class="sl">🗣️ أصوات الكليان</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05"></div>
     <div class="setrow" data-k="sfx"><span class="sl">🔔 المؤثرات وجو المطعم</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05"></div>
     <div class="setrow" id="vibRow"><span class="sl">📳 الهزة ديال التيليفون</span><button class="tog"></button></div>
@@ -885,11 +892,70 @@ const AUD={master:null,music:null,musicBus:null,sfxBus:null,amb:null,ambDry:null
   vol:{music:{on:true,v:.8},voices:{on:true,v:1},sfx:{on:true,v:.8}}};
 try{const v=JSON.parse(localStorage.getItem('matbakh2_vol'));if(v)AUD.vol=v}catch(e){}
 const volOf=k=>AUD.vol[k].on?AUD.vol[k].v:0;
+
+/* ---- radio: real Moroccan stations, for players who'd rather hear the radio than the game music ---- */
+// [id, label, stream] — all https, checked to play in the browser
+const STATIONS=[
+  ['medina','📻 ميدينا FM','https://medinafm.ice.infomaniak.ch/medinafm-128.mp3'],
+  ['hit','🎧 هيت راديو','https://hitradio-maroc.ice.infomaniak.ch/hitradio-maroc-128.mp3'],
+  ['mars','⚽ راديو مارس','https://radiomars.ice.infomaniak.ch/radiomars-128.mp3'],
+  ['aswat','🎙️ أصوات','https://broadcast.ice.infomaniak.ch/aswat-high.mp3'],
+  ['m1hits','🎶 ميدي 1 هيتس','https://cdn.live.easybroadcast.io/medi1radio/Hits'],
+  ['m1tarab','🎻 ميدي 1 طرب','https://cdn.live.easybroadcast.io/medi1radio/Tarab'],
+  ['chaabi','🥁 الشعبي','https://radio.yabiladi.com:8102/;stream.mp3'],
+  ['tarab','🎼 ميدينا طرب','https://medinatarab.ice.infomaniak.ch/medinatarab-128.mp3'],
+  ['nostalgie','📼 ميدينا نوسطالجي','https://medinanachat.ice.infomaniak.ch/medinanachat-128.mp3'],
+  ['andalou','🕌 ميدينا أندلسي','https://medinaandalou.ice.infomaniak.ch/medinaandalou-128.mp3'],
+  ['amazigh','🏔️ ميدينا أمازيغ','https://medinaamazigh.ice.infomaniak.ch/medinaamazigh-128.mp3'],
+  ['agadir','🌅 راديو بلوس أكادير','https://stream-158.zeno.fm/bqdbb6hd0neuv'],
+  ['marrakech','🌴 مراكش بلوس','https://cast5.my-control-panel.com/proxy/marrakec/stream'],
+  ['skyrock','🎤 سكايروك كازا','https://icecast.skyrock.net/s/casa_aac_64k'],
+];
+const RADIO={id:null,v:.8,last:'medina',want:false,el:null,ducked:false,stat:'',retry:0};
+try{const r=JSON.parse(localStorage.getItem('matbakh_radio'));if(r){RADIO.v=r.v??.8;RADIO.last=r.last||'medina';RADIO.want=!!r.on}}catch(e){}
+const stOf=id=>STATIONS.find(s=>s[0]===id)||STATIONS[0];
+function saveRadio(){try{localStorage.setItem('matbakh_radio',JSON.stringify({v:RADIO.v,last:RADIO.last,on:!!RADIO.id}))}catch(e){}}
+function radioVol(){if(RADIO.el)RADIO.el.volume=RADIO.v*(RADIO.ducked?.35:1)}   // quieter while a customer talks
+function radioStatus(t){RADIO.stat=t;const e=$('#radioStat');if(e&&RADIO.id)e.textContent=t}
+function playRadio(id){
+  const st=stOf(id);
+  if(!RADIO.el){
+    const a=RADIO.el=new Audio();a.preload='none';
+    a.addEventListener('playing',()=>{RADIO.retry=0;radioStatus('🔴 مباشر: '+stOf(RADIO.id)[1])});
+    a.addEventListener('waiting',()=>radioStatus('⏳ كيتشارجا…'));
+    a.addEventListener('error',()=>{
+      if(!RADIO.id)return;
+      // a dropped stream gets one quiet retry before telling the player
+      if(RADIO.retry++<1){radioStatus('⏳ كنعاود نتاصل…');setTimeout(()=>RADIO.id&&playRadio(RADIO.id),2000);return}
+      radioStatus('❌ هاد الإذاعة ما خدماتش دابا، ختار وحدة خرا');
+    });
+  }
+  if(RADIO.id!==st[0])RADIO.retry=0;
+  RADIO.id=RADIO.last=st[0];RADIO.el.src=st[2];radioVol();
+  radioStatus('⏳ كيتشارجا '+st[1]+'…');
+  RADIO.el.play().catch(e=>{if(e.name==='NotAllowedError')radioStatus('👆 كليكي على الإذاعة باش تبدا')});
+  saveRadio();applyVolumes();renderRadio();
+}
+function stopRadio(){
+  RADIO.id=null;
+  if(RADIO.el){RADIO.el.pause();RADIO.el.removeAttribute('src');RADIO.el.load()}
+  saveRadio();applyVolumes();renderRadio();
+}
+function renderRadio(){
+  const r=$('#radioRow');if(!r)return;const on=!!RADIO.id;
+  r.classList.toggle('off',!on);
+  const b=r.querySelector('.tog');b.textContent=on?'✅ مشعول':'❌ مطفي';b.classList.toggle('off',!on);
+  r.querySelector('input').value=RADIO.v;
+  $('#radioList').innerHTML=STATIONS.map(s=>`<button class="rst${s[0]===RADIO.id?' on':''}" data-id="${s[0]}">${s[1]}</button>`).join('');
+  $('#radioStat').textContent=on?RADIO.stat:'ختار إذاعة مغربية وسمع ليها وانت كتطيب 🎧';
+  const np=$('#nowPlaying');
+  if(np&&!$('#setScr').classList.contains('hidden'))np.textContent=on?'📻 كتسمع دابا: '+stOf(RADIO.id)[1]+' (الموسيقى ديال اللعبة واقفة)':'🎵 الموسيقى دابا: '+(STYLES[MUS.styleId]||STYLES.menu).name;
+}
 function initAudio(){
   if(AC){if(AC.state==='suspended')AC.resume();return}
   try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return}
   AUD.master=AC.createGain();AUD.master.gain.value=.85;AUD.master.connect(AC.destination);
-  AUD.musicBus=AC.createGain();AUD.musicBus.gain.value=volOf('music');AUD.musicBus.connect(AUD.master);
+  AUD.musicBus=AC.createGain();AUD.musicBus.gain.value=(RADIO.id?0:volOf('music'));AUD.musicBus.connect(AUD.master);
   AUD.sfxBus=AC.createGain();AUD.sfxBus.gain.value=volOf('sfx');AUD.sfxBus.connect(AUD.master);
   AUD.music=AC.createGain();AUD.music.gain.value=0;AUD.music.connect(AUD.musicBus);
   // restaurant bus: voices muffled like a room
@@ -913,7 +979,7 @@ function setAudioMode(m,style){
 }
 function applyVolumes(){
   try{localStorage.setItem('matbakh2_vol',JSON.stringify(AUD.vol))}catch(e){}
-  if(AC){AUD.musicBus.gain.setTargetAtTime(volOf('music'),AC.currentTime,.1);AUD.sfxBus.gain.setTargetAtTime(volOf('sfx'),AC.currentTime,.1)}
+  if(AC){AUD.musicBus.gain.setTargetAtTime((RADIO.id?0:volOf('music')),AC.currentTime,.1);AUD.sfxBus.gain.setTargetAtTime(volOf('sfx'),AC.currentTime,.1)}
   if(VOICE.cur)VOICE.cur.volume=volOf('voices');
   const allOff=!AUD.vol.music.on&&!AUD.vol.voices.on&&!AUD.vol.sfx.on;
   $('#setBtn').textContent=allOff?'🔇':'⚙️';
@@ -1138,6 +1204,7 @@ function nextVoice(){
 }
 function stopVoices(){VOICE.q=[];if(VOICE.cur){VOICE.cur.onended=null;VOICE.cur.pause();VOICE.cur=null}duck(false)}
 function duck(on){
+  RADIO.ducked=on;radioVol();
   if(!AC)return;
   const base=AUD.mode==='game'?.32:.6;
   AUD.music.gain.setTargetAtTime(on?base*.35:base,AC.currentTime,.15);
@@ -1956,6 +2023,7 @@ function renderSettings(){
   });
   const vb=$('#vibRow .tog');vb.textContent=VIB?'✅ مشعولة':'❌ مطفية';vb.classList.toggle('off',!VIB);$('#vibRow').classList.toggle('off',!VIB);
   $('#nowPlaying').textContent='🎵 الموسيقى دابا: '+(STYLES[MUS.styleId]||STYLES.menu).name;
+  renderRadio();
 }
 function openSettings(){
   setWasRunning=running; if(running){running=false;stopVoices()}
@@ -1976,6 +2044,11 @@ document.querySelectorAll('.setrow[data-k]').forEach(r=>{
 });
 $('#setBtn').addEventListener('click',e=>{e.stopPropagation();initAudio();openSettings()});
 $('#setClose').onclick=closeSettings;
+$('#radioRow .tog').onclick=()=>{RADIO.want=false;RADIO.id?stopRadio():playRadio(RADIO.last)};
+$('#radioRow input').oninput=e=>{RADIO.v=+e.target.value;radioVol();saveRadio()};
+$('#radioList').addEventListener('click',e=>{const b=e.target.closest('.rst');if(b){RADIO.want=false;playRadio(b.dataset.id)}});
+// whoever left the radio on last time gets it back on their first tap (browsers block sound before that)
+document.addEventListener('pointerdown',()=>{if(RADIO.want&&!RADIO.id){RADIO.want=false;playRadio(RADIO.last)}},{once:true});
 // phone: the recipe book opens as a sheet instead of taking room under the kitchen
 $('#bookBtn').addEventListener('click',e=>{e.stopPropagation();document.body.classList.toggle('showbook')});
 $('#bookSect').addEventListener('click',()=>document.body.classList.remove('showbook'));
