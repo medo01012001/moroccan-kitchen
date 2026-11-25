@@ -297,6 +297,51 @@ body.blackout .stove .fire{opacity:.15!important}
 @keyframes catIn{from{transform:translateX(-170px)}}
 @keyframes catWig{to{transform:rotate(-8deg) translateY(-3px)}}
 @keyframes catOut{to{transform:translateX(-280px);opacity:0}}
+/* VIP, mama, smoke, decor, shop, medals */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row2 .btn{font-size:15px;padding:8px 6px}
+#kitchen{position:relative}
+#kitchen.s3{grid-template-columns:1fr 1fr 1fr 1.3fr}
+.cust.vip{border:3px solid var(--gold)!important;background:linear-gradient(#fff8d8,#fff)!important;box-shadow:0 0 10px rgba(224,169,59,.6)}
+.cust .vipb{position:absolute;top:-9px;right:50%;transform:translateX(50%);background:var(--gold);color:var(--ink);font-size:10px;font-weight:900;border-radius:999px;padding:0 7px;white-space:nowrap}
+.smoke{position:fixed;font-size:34px;pointer-events:none;z-index:24;animation:smoke 2.2s ease-out both}
+body.blackout.lit #app>.sect{filter:brightness(.82) saturate(.9)}
+@keyframes smoke{0%{opacity:0;transform:translate(0,0) scale(.6)}15%{opacity:.95}100%{opacity:0;transform:translate(var(--dx),-150px) scale(2.2)}}
+#mama{position:absolute;top:-36px;right:8px;font-size:44px;line-height:1;z-index:7;animation:catIn .6s ease-out,catWig .5s .6s infinite alternate;filter:drop-shadow(0 3px 2px rgba(0,0,0,.35));pointer-events:none}
+#mama small{position:absolute;top:-6px;right:44px;font-size:12px;font-weight:900;background:#fff;color:var(--ink);border:2px solid var(--gold);border-radius:12px;padding:2px 8px;width:max-content;max-width:210px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+#mama.run{animation:catOut .7s forwards}
+#decorRow{display:flex;gap:6px;justify-content:center;font-size:24px;margin:-2px 0 6px;flex-wrap:wrap}
+#decorRow span{animation:hop 1.6s ease-in-out infinite;display:inline-block}
+#decorRow span:nth-child(2n){animation-delay:.4s}
+body.zellige .sect{background-image:linear-gradient(var(--card),var(--card)),repeating-conic-gradient(var(--teal) 0 25%,var(--gold) 0 50%);background-origin:border-box;background-clip:padding-box,border-box;border:4px solid transparent;background-size:auto,14px 14px}
+body.rug #customers{background:repeating-linear-gradient(90deg,rgba(192,57,43,.10) 0 10px,rgba(224,169,59,.12) 10px 20px);border-radius:12px;padding:4px}
+.shlist{display:flex;flex-direction:column;gap:6px;margin-top:6px;text-align:right}
+.shrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:12px;padding:6px 8px}
+.shrow>b{font-size:30px;line-height:1}
+.shrow .mn{font-weight:900;font-size:15px;line-height:1.3}
+.shrow .mn small{display:block;font-weight:700;font-size:12px;color:var(--muted)}
+.shrow.own{border-color:var(--green);background:#f1faf4}
+.shrow .ok{color:var(--green);font-weight:900;font-size:13px}
+.medgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:8px}
+.med{background:#fff;border:2px solid var(--line);border-radius:12px;padding:6px;font-size:12px;font-weight:700}
+.med b{display:block;font-size:30px;line-height:1.2}
+.med .mt{font-weight:900;font-size:13px}
+.med .pr{color:var(--muted);font-size:11px}
+.med.lock b{filter:grayscale(1);opacity:.4}
+.med.got{border-color:var(--gold);background:#fff8e0}
+.medtoast{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.medtoast span{background:#fff;border-radius:999px;padding:2px 10px;font-weight:900}
+@media (max-width:700px){#kitchen.s3{grid-template-columns:1fr 1fr 1fr}}
+@media (max-width:600px){
+  .row2 .btn{font-size:13px;padding:7px 4px}
+  .cust .vipb{font-size:9px;top:-8px}
+  #mama{font-size:34px;top:-26px}
+  #mama small{font-size:10px;right:34px;max-width:170px}
+  #decorRow{font-size:18px;margin:-2px 0 4px}
+  .medgrid{grid-template-columns:1fr 1fr}
+  .shrow{gap:6px;padding:5px 6px}
+  .shrow>b{font-size:26px}
+}
 /* ---- phone: whole kitchen fits on one screen ---- */
 button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
 @media (max-width:600px){
@@ -377,14 +422,13 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
 
   <div class="sect">
     <h2>الكليان 🧍 (كليكي على الكليان باش تعطيه الماكلة)</h2>
+    <div id="decorRow" class="hidden"></div>
     <div id="customers"></div>
   </div>
 
   <div class="sect">
     <h2>الكوزينة 🔥 (<span data-g="حط|حطي">حط</span> العناصر فالطبلة، ومن بعد كليكي على الكانون)</h2>
     <div id="kitchen">
-      <div class="stove" data-i="0"></div>
-      <div class="stove" data-i="1"></div>
       <div class="board">
         <div class="title">🪵 الطبلة</div>
         <div id="boardItems"></div>
@@ -429,6 +473,7 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     <div class="btns">
       <button class="btn alt hidden" id="contBtn">▶ كمل اللعبة</button>
       <button class="btn go" id="newBtn">🍳 لعبة جديدة</button>
+      <button class="btn ghost hidden" id="medBtn">🏅 الميداليات</button>
       <button class="btn ghost" id="howBtn">📖 كيفاش نلعب؟</button>
     </div>
     <div class="records">
@@ -473,6 +518,10 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     🔥 كومبو: 3 كليان مورا بعضياتهم بلا غلط = الفلوس ×1.5، و5 = دوبل!<br>
     🐈 إلا دخل القط للكوزينة، <span data-g="كليكي|كليكي">كليكي</span> عليه دغيا قبل ما يسرق ليك السلعة.<br>
     🎲 رد بالك من المفاجآت: الضو يمشي ⚡، عرس فالدرب 🎉، ولا الشتا 🌧️.<br>
+    👑 كليان VIP: صبرهم قليل ولكن كيخلصو دوبل وبقشيش كبير!<br>
+    👵 الماما كتدوز مرة مرة للكوزينة… وكتعاون (ولا كتزيد الملحة 🧂).<br>
+    🌙 نهار رمضان: الصباح هادي، ومع أذان المغرب كيجيو الكليان كاملين!<br>
+    🏺 <span data-g="شري|شريي">شري</span> الديكور والترقية للمطعم، و<span data-g="جمع|جمعي">جمع</span> الميداليات 🏅.<br>
     💨 <span data-g="رد|ردي">رد</span> بالك: الماكلة كتحرق إلا خليتيها فالكانون بزاف!<br>
     ⏰ النهار من 9:00 حتى 18:00. <span data-g="وصل|وصلي">وصل</span> للهدف باش تاخد النجوم ⭐. فـ18:00 كيتسد الباب، ولكن النهار ما كيساليش حتى <span data-g="تعطي|تعطيي">تعطي</span> لآخر كليان الطلب ديالو.<br>
     ❤️ إلا مشاو ٣ ديال الكليان معصبين، كتسد بكري داك النهار.</p>
@@ -520,8 +569,12 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     <p id="diTxt"></p>
     <div class="btns">
       <button class="btn go" id="diGo"><span data-g="حل|حلي">حل</span> المطعم! 🔓</button>
-      <button class="btn buy" id="diMkt">🛒 السوق</button>
-      <button class="btn ghost" id="diMap">🗺️ الخريطة</button>
+      <div class="row2">
+        <button class="btn buy" id="diMkt">🛒 السوق</button>
+        <button class="btn buy" id="diShop">🏺 الديكور والترقية</button>
+        <button class="btn ghost" id="diMed">🏅 الميداليات</button>
+        <button class="btn ghost" id="diMap">🗺️ الخريطة</button>
+      </div>
     </div>
   </div>
 </div>
@@ -549,11 +602,16 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     <div id="deMsg" style="font-weight:700"></div>
     <table class="sumtbl" id="deTbl"></table>
     <div class="dishes" id="deDishes"></div>
+    <div class="notice hidden" id="deMed"></div>
     <div class="notice hidden" id="deBuy"></div>
     <div class="btns">
       <button class="btn go" id="deNext">النهار الجاي ☀️</button>
-      <button class="btn buy" id="deMkt">🛒 السوق</button>
-      <button class="btn alt" id="deMap">🗺️ الخريطة</button>
+      <div class="row2">
+        <button class="btn buy" id="deMkt">🛒 السوق</button>
+        <button class="btn buy" id="deShop">🏺 الديكور والترقية</button>
+        <button class="btn alt" id="deMap">🗺️ الخريطة</button>
+        <button class="btn alt" id="deShare">📤 <span data-g="بارطاجي|بارطاجي">بارطاجي</span> النتيجة</button>
+      </div>
     </div>
   </div>
 </div>
@@ -575,6 +633,31 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
   </div>
 </div>
 
+<!-- decor & upgrades shop -->
+<div class="overlay hidden" id="shopScr">
+  <div class="panel">
+    <div class="big">🏺</div>
+    <h1>الديكور والترقية</h1>
+    <div class="stat" style="background:#fdf0d5;display:inline-block;margin:6px 0;font-weight:900">🏦 <b id="shBank">0</b> درهم</div>
+    <div class="lbl2" style="margin-top:4px">🏺 الديكور (كيبان فالمطعم وكيفرح الكليان)</div>
+    <div class="shlist" id="shDecor"></div>
+    <div class="lbl2">🔧 ترقية المطبخ</div>
+    <div class="shlist" id="shUpg"></div>
+    <div class="btns"><button class="btn go" id="shDone">ساليت ✔</button></div>
+  </div>
+</div>
+
+<!-- medals -->
+<div class="overlay hidden" id="medScr">
+  <div class="panel">
+    <div class="big">🏅</div>
+    <h1>الميداليات</h1>
+    <div class="lbl2" id="medCount" style="margin-top:2px"></div>
+    <div class="medgrid" id="medGrid"></div>
+    <div class="btns"><button class="btn go" id="medDone">رجع ↩</button></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 <button id="setBtn" title="الإعدادات">⚙️</button>
 <div id="setScr" class="hidden">
@@ -584,6 +667,7 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     <div class="setrow" data-k="music"><span class="sl">🎵 الموسيقى</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05"></div>
     <div class="setrow" data-k="voices"><span class="sl">🗣️ أصوات الكليان</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05"></div>
     <div class="setrow" data-k="sfx"><span class="sl">🔔 المؤثرات وجو المطعم</span><button class="tog"></button><input type="range" min="0" max="1" step="0.05"></div>
+    <div class="setrow" id="vibRow"><span class="sl">📳 الهزة ديال التيليفون</span><button class="tog"></button></div>
     <div id="nowPlaying"></div>
     <div class="btns">
       <button class="btn go" id="setClose">رجع للعب ✔</button>
@@ -1005,6 +1089,9 @@ const sfx={
     g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(.14,t+.05);g.gain.exponentialRampToValueAtTime(.001,t+d);
     o.connect(g);g.connect(AUD.sfxBus);o.start(t);o.stop(t+d+.02);
   }catch(e){}},
+  cough:()=>{try{if(!AC||!AUD.noise)return;[0,.24,.44].forEach(dl=>{const t=AC.currentTime+dl,src=noiseSrc(t,.17),f=AC.createBiquadFilter(),gn=AC.createGain();
+    f.type='bandpass';f.frequency.value=800+Math.random()*300;f.Q.value=1.3;src.connect(f);f.connect(gn);gn.connect(AUD.sfxBus);env(gn,t,.4,.01,.15)})}catch(e){}},
+  adhan:()=>[0,1,4,5,4,1,0].forEach((n,i)=>setTimeout(()=>beep(NOTE(n-5),.5,'triangle',.09),i*360)),
   combo:n=>[660,880,1100,1320].slice(0,Math.min(4,n-1)).forEach((f,i)=>setTimeout(()=>beep(f,.1,'square',.07),i*70)),
 };
 
@@ -1046,8 +1133,13 @@ function newDayState(){
      combo:0,bestCombo:0,
      cat:null,catShoo:0,catStole:0,
      catAt:Math.random()<.8?rnd(12,70):-1, cat2At:G.rdays[G.cur]>=2&&Math.random()<.5?rnd(72,88):0,
-     ev:null, evAt:Math.random()<.7?rnd(25,62):-1};
+     ev:null, evAt:Math.random()<.7?rnd(25,62):-1,
+     vipN:0,vipServed:0,cough:0,mama:null,mamaSalt:0,mamaAt:G.days>=1&&Math.random()<.55?rnd(18,80):-1,
+     ramadan:isRamadan(),ftour:false,ftourAt:62};
+  S.stoves=Array.from({length:nStoves()},()=>({st:'empty'}));
+  if(S.ramadan)S.evAt=-1;
   if(typeof resetFun==='function'){resetFun();renderCombo()}
+  buildStoves();renderDecor();if(S.ramadan)rmBanner();
   buildIngs();buildBook();renderAll();
 }
 /* ---- stock & market ---- */
@@ -1059,7 +1151,12 @@ const menuIngs=(i=G.cur)=>[...new Set(REGIONS[i].dishes.flatMap(d=>R[d].ing))];
 const stk=k=>(G.stock&&G.stock[k])||0;
 const canMake=id=>R[id].ing.every(k=>stk(k)>0);
 function giveStock(keys,n){keys.forEach(k=>{G.stock[k]=stk(k)+n})}
+function ensureG(){
+  G.decor=G.decor||[];G.upg=G.upg||[];G.medals=G.medals||[];
+  G.st=Object.assign({served:0,atay:0,vip:0,cats:0,combo:0,noburn:0,stars3:0,ramadan:0},G.st||{});
+}
 function ensureStock(){
+  ensureG();
   if(G.stock)return;
   G.stock={};for(let i=0;i<G.owned;i++)giveStock(menuIngs(i),6);if(G.name)save();
 }
@@ -1154,7 +1251,7 @@ function spawnCat(){
   removeCat();
   const c=document.createElement('div');c.id='cat';c.innerHTML='🐈<small>ميااو</small>';
   c.addEventListener('click',e=>{e.stopPropagation();if(!running||!S.cat)return;
-    S.cat=null;S.catShoo++;sfx.meow(true);toast(pick(['سير فحالك يا المش! 😾','بششش! هرب القط 🐈💨','ماشي اليوم أ المش 😼']));
+    S.cat=null;S.catShoo++;G.st.cats++;sfx.meow(true);toast(pick(['سير فحالك يا المش! 😾','بششش! هرب القط 🐈💨','ماشي اليوم أ المش 😼']));
     c.classList.add('run');setTimeout(()=>c.remove(),600)});
   board.appendChild(c);
   S.cat={t:0,life:Math.max(3.2,5-diff()*.15)};
@@ -1171,16 +1268,162 @@ function catSteal(){
     const si=S.stoves.findIndex(s=>s.st==='ready');
     if(si>=0&&Math.random()<.5){what=R[S.stoves[si].dish].icon+' '+R[S.stoves[si].dish].name;S.stoves[si]={st:'empty'};renderStoves(true);breakCombo()}
     else{
+      if(hasU('fridge')){save();sfx.meow(true);toast('😹 القط حاول يحل الفريگو 🧊 وما قدرش!');const c=$('#cat');if(c){c.classList.add('run');setTimeout(()=>c.remove(),600)}return}
       const ks=menuIngs().filter(k=>stk(k)>0);
       const k=ks.includes('fish')?'fish':ks.length?pick(ks):null;
       if(k){G.stock[k]=stk(k)-1;what=ING[k][0]+' '+ING[k][1];renderStock()}
     }
   }
-  save();sfx.meow(true);
+  save();sfx.meow(true);buzz([60,40,60]);
   toast(what?`😹 القط هرب بـ${what}!`:'😹 القط ما لقا والو وهرب');
   const c=$('#cat');if(c){c.classList.add('run');setTimeout(()=>c.remove(),600)}
 }
-function resetFun(){endEvent();removeCat()}
+function resetFun(){endEvent();removeCat();const m=$('#mama');if(m)m.remove()}
+
+/* ---- reactions, mama, VIP, ramadan, decor, upgrades, medals, vibration, share ---- */
+let VIB=(()=>{try{return localStorage.getItem('matbakh_vib')!=='0'}catch(e){return true}})();
+function buzz(p){if(VIB&&navigator.vibrate&&(!navigator.userActivation||navigator.userActivation.hasBeenActive))try{navigator.vibrate(p)}catch(e){}}
+const BURN_LINES=['كح كح! 😷 شنو هاد الدخان؟! الماكلة تحرقات 🔥','🚒 الجيران عيطو للبومبية! الماكلة تحرقات','😂 ريحة الشياط وصلات للدرب كامل!','🔥 أويلي! الكليان كاملين كيكحو 😷'];
+function smokeBurst(el){
+  const r=el.getBoundingClientRect();
+  for(let i=0;i<7;i++){const f=document.createElement('div');f.className='smoke';f.textContent=pick(['💨','☁️','💨']);
+    f.style.left=(r.left+r.width/2-17+(Math.random()*40-20))+'px';f.style.top=(r.top+10)+'px';
+    f.style.setProperty('--dx',(Math.random()*120-60)+'px');f.style.animationDelay=(i*.12)+'s';
+    document.body.appendChild(f);setTimeout(()=>f.remove(),3200)}
+}
+const DRINKS=['atay','sahtea','orange','zrig','camelmilk','datemilk'];
+function wrongLine(c){
+  const got=R[S.hand], want=R[c.dish], W=`${want.icon} ${want.name}`;
+  if(DRINKS.includes(S.hand)&&!DRINKS.includes(c.dish))return `${got.name}؟! أنا جيت ناكل ماشي نشرب! 😂 بغيت ${W}`;
+  if(DRINKS.includes(c.dish)&&!DRINKS.includes(S.hand))return `بغيت غير ${want.name} وجبتي ليا ${got.name} كامل؟! 😂`;
+  return pick([`${got.icon} ${got.name}؟! واش ${got.name} كتشبه لـ${want.name}؟ 👓`,`هادي ديال الجار! أنا قلت ${W} 😅`,
+    `الله يهديك… ${W} قلت ليك، ماشي ${got.name} 🙄`,`واش ${g('ناعس','ناعسة')}؟ 😴 بغيت ${W}`,`${g('سمعني','سمعيني')} مزيان: ${W}! 👂`]);
+}
+// mama
+const MAMA_TIPS=()=>[`${g('ولدي','بنتي')}، ${g('عطي','عطيي')} اللول للكليان اللي قرب يسالي ليه الصبر`,`ما تخليش الماكلة فالكانون، راه كتحرق! 🔥`,
+  `${g('سير','سيري')} للسوق قبل ما تقاضا السلعة 🛒`,`الله يرضي عليك ${g('أولدي','أبنتي')}، ${g('كمل','كملي')} هاكا 🤲`,`فزماني كنا كنطيبو للعرس كامل بكانون واحد! 😤`];
+function spawnMama(){
+  const m0=$('#mama');if(m0)m0.remove();
+  const m=document.createElement('div');m.id='mama';m.innerHTML='👵<small>السلام! شنو كتطيب؟ 👀</small>';
+  $('#kitchen').appendChild(m);S.mama={t:0,done:false};
+  toast('👵 الماما دخلات للكوزينة!');beep(440,.1,'triangle',.08);
+}
+function mamaSay(t){const m=$('#mama');if(m)m.querySelector('small').textContent=t}
+function mamaAct(){
+  S.mama.done=true;
+  const ci=S.stoves.findIndex(s=>s.st==='cooking'), bi=S.stoves.findIndex(s=>s.st==='burnt'), low=menuIngs().filter(k=>stk(k)<=1), r=Math.random();
+  if(bi>=0&&r<.75){S.stoves[bi]={st:'empty'};renderStoves(true);mamaSay('آش هاد الدخان؟! جيب نقيه ليك 🧽');toast('👵 الماما نقات الكانون المحروق')}
+  else if(ci>=0&&r<.5){const s=S.stoves[ci];S.stoves[ci]={st:'ready',dish:s.dish,t:0};sfx.ready();renderStoves(true);
+    mamaSay('ماشي هاكا كيطيبو! عطيني نوري ليك 😤');toast(`👵 الماما كملات ${R[s.dish].icon} ${R[s.dish].name} فدقة!`)}
+  else if(low.length&&r<.75){const k=pick(low);giveStock([k],3);save();renderStock();
+    mamaSay(`جبت ليك ${ING[k][0]} من الدار، ما تقولش ما عندكش!`);toast(`👵 الماما جابت ليك 3 ديال ${ING[k][0]} ${ING[k][1]} 🎁`)}
+  else if(r<.6){S.mamaSalt=1;mamaSay('زدت ليك شوية الملحة… ما تقول والو 🤫🧂');toast('🧂 الماما زادت الملحة بلا ما تقولك… الكليان الجاي غادي يحكم!')}
+  else mamaSay(pick(MAMA_TIPS()));
+}
+function removeMama(){S.mama=null;const m=$('#mama');if(m){m.classList.add('run');setTimeout(()=>m.remove(),700)}}
+// VIP
+const VIPS=[['⚽','لاعب المنتخب','yassine','أنا مستعجل، عندي التدريب! بغيت'],['🎤','المغنية المشهورة','khadija','عافاك دغيا، عندي سهرة! بغيت'],
+  ['🎬','الممثل ديال المسلسل','mohamed','الكاميرات كيتسناوني، بغيت'],['🕺','الفنان الشعبي','arbi','آ الشريف! بغيت']];
+// ramadan
+const isRamadan=()=>G.days>0&&(G.days+1)%6===0;
+const FTOUR=['harira','atay','sahtea','datemilk','camelmilk','sellou','msemen','bissara','zrig','orange','seffa'];
+function rmBanner(){
+  $('#evBanner').classList.remove('hidden');
+  $('#evIcon').textContent=S.ftour?'🍲':'🌙';
+  $('#evName').textContent=S.ftour?'الفطور! صحة فطوركم':'نهار رمضان';
+  $('#evDesc').textContent=S.ftour?'الكليان جاو كاملين — الفلوس +30% 🌙':'الصباح هادي… مع أذان المغرب غادي يجيو الكليان كاملين';
+}
+function updateRamadan(){
+  if(!S.ftour){
+    $('#evBar').style.width=Math.max(0,100-S.time/S.ftourAt*100)+'%';
+    if(S.time>=S.ftourAt){S.ftour=true;rmBanner();sfx.adhan();buzz([100,60,100]);toast('🌙 أذان المغرب! وقت الفطور — الكليان جايين!');
+      for(let k=0;k<3;k++)if(running&&S.customers.some(c=>!c))spawn();S.spawnT=1.5}
+  }else $('#evBar').style.width=Math.max(0,100-(S.time-S.ftourAt)/(DAY_LEN-S.ftourAt)*100)+'%';
+}
+// decor & upgrades
+const DECOR=[
+  {id:'roses',icon:'🌹',name:'بوقال الورد',price:120,desc:'+2 بقشيش على كل كليان'},
+  {id:'rug',icon:'🧶',name:'زربية رباطية',price:200,desc:'الكليان كيصبرو +10%'},
+  {id:'lantern',icon:'🏮',name:'فانوس النحاس',price:300,desc:'ملي يمشي الضو، الكوزينة كتبقى مضوية والكوانين خدامين مزيان'},
+  {id:'zellige',icon:'🔷',name:'زليج فاسي',price:450,desc:'الكليان كيصبرو +15%'},
+  {id:'fountain',icon:'⛲',name:'خصة فالوسط',price:700,desc:'+5 بقشيش على كل كليان'},
+];
+const UPG=[
+  {id:'fridge',icon:'🧊',name:'فريگو',price:250,desc:'القط ما بقاش يقدر يسرق من السلعة'},
+  {id:'pot',icon:'🏺',name:'طواجن ديال الطين',price:350,desc:'الماكلة كتصبر 11 ثانية قبل ما تحرق (عوض 7)'},
+  {id:'gas',icon:'⚡',name:'كوانين بالغاز',price:500,desc:'كلشي كيطيب أسرع بـ30%'},
+  {id:'stove3',icon:'🔥',name:'كانون ثالث',price:650,desc:'تطيب 3 ديال الماكلات فنفس الوقت'},
+];
+const hasD=id=>!!(G.decor&&G.decor.includes(id)), hasU=id=>!!(G.upg&&G.upg.includes(id));
+const nStoves=()=>hasU('stove3')?3:2, burnT=()=>hasU('pot')?11:BURN, cookMult=()=>hasU('gas')?1.3:1;
+const patMult=()=>1+(hasD('rug')?.1:0)+(hasD('zellige')?.15:0), decorTip=()=>(hasD('roses')?2:0)+(hasD('fountain')?5:0);
+function buildStoves(){
+  const k=$('#kitchen'), b=k.querySelector('.board'), n=S.stoves.length;
+  k.querySelectorAll('.stove').forEach(e=>e.remove());
+  for(let i=0;i<n;i++){const d=document.createElement('div');d.className='stove';d.dataset.i=i;k.insertBefore(d,b)}
+  k.classList.toggle('s3',n===3);
+}
+function renderDecor(){
+  const row=$('#decorRow');ensureG();
+  row.innerHTML=DECOR.filter(d=>hasD(d.id)).map(d=>`<span title="${d.name}">${d.icon}</span>`).join('');
+  row.classList.toggle('hidden',!G.decor.length);
+  document.body.classList.toggle('zellige',hasD('zellige'));document.body.classList.toggle('rug',hasD('rug'));document.body.classList.toggle('lit',hasD('lantern'));
+}
+let shopBack=null;
+function openShop(back){ensureStock();shopBack=back||dayIntro;renderShop();showScr('shopScr')}
+function renderShop(){
+  $('#shBank').textContent=G.bank;
+  const row=(it,own,kind)=>`<div class="shrow ${own?'own':''}"><b>${it.icon}</b><div class="mn">${it.name}<small>${it.desc}</small></div>`+
+    (own?'<span class="ok">✅ عندك</span>':`<button class="btn mb" data-kind="${kind}" data-id="${it.id}" ${G.bank<it.price?'disabled':''}>${it.price}<small>درهم</small></button>`)+'</div>';
+  $('#shDecor').innerHTML=DECOR.map(d=>row(d,hasD(d.id),'decor')).join('');
+  $('#shUpg').innerHTML=UPG.map(u=>row(u,hasU(u.id),'upg')).join('');
+}
+$('#shopScr').addEventListener('click',e=>{
+  const b=e.target.closest('.mb');if(!b||b.disabled)return;
+  const dec=b.dataset.kind==='decor', it=(dec?DECOR:UPG).find(x=>x.id===b.dataset.id);
+  if(!it||G.bank<it.price||(dec?hasD(it.id):hasU(it.id)))return;
+  G.bank-=it.price;(dec?G.decor:G.upg).push(it.id);
+  const nm=checkMedals();save();updRec();sfx.fanfare();buzz(40);renderShop();renderDecor();
+  toast(`${it.icon} ${it.name} — مبروك! 🎉`+(nm.length?` 🏅 ${nm[0].name} +${nm[0].gift}د`:''));
+});
+$('#shDone').onclick=()=>shopBack();
+// medals
+const MEDALS=[
+  {id:'s10',icon:'🥉',name:'البداية',desc:'10 كليان مخدومين',v:()=>G.st.served,n:10,gift:30},
+  {id:'s100',icon:'🥈',name:'طباخ الدرب',desc:'100 كليان مخدومين',v:()=>G.st.served,n:100,gift:100},
+  {id:'s500',icon:'🥇',name:'طباخ المدينة',desc:'500 كليان مخدومين',v:()=>G.st.served,n:500,gift:300},
+  {id:'atay50',icon:'🫖',name:'مول أتاي',desc:'50 كاس ديال أتاي',v:()=>G.st.atay,n:50,gift:100},
+  {id:'noburn',icon:'🧯',name:'نهار بلا حريق',desc:'نهار فيه 6 كليان ولا كثر بلا حتى طبسيل محروق',v:()=>G.st.noburn,n:1,gift:60},
+  {id:'combo10',icon:'🔥',name:'نار الكومبو',desc:'كومبو ×10',v:()=>G.st.combo,n:10,gift:100},
+  {id:'cat10',icon:'🐈',name:'عدو المشاش',desc:'القط هرب 10 مرات',v:()=>G.st.cats,n:10,gift:60},
+  {id:'vip5',icon:'👑',name:'صاحب النجوم',desc:'5 ديال VIP فرحانين',v:()=>G.st.vip,n:5,gift:120},
+  {id:'star3',icon:'⭐',name:'ثلاث نجوم',desc:'نهار كامل بـ3 نجوم',v:()=>G.st.stars3,n:1,gift:80},
+  {id:'ramadan',icon:'🌙',name:'رمضان كريم',desc:'نهار رمضان كامل',v:()=>G.st.ramadan,n:1,gift:50},
+  {id:'decor',icon:'🏺',name:'دار المعلم',desc:'الديكور كامل فالمطعم',v:()=>G.decor.length,n:DECOR.length,gift:150},
+  {id:'rest6',icon:'🏪',name:'نص المغرب',desc:'6 ديال المطاعم',v:()=>G.owned,n:6,gift:200},
+];
+function checkMedals(){
+  ensureG();
+  const nw=MEDALS.filter(m=>!G.medals.includes(m.id)&&m.v()>=m.n);
+  nw.forEach(m=>{G.medals.push(m.id);G.bank+=m.gift});return nw;
+}
+let medBack=null;
+function openMedals(back){ensureStock();medBack=back||dayIntro;renderMedals();showScr('medScr')}
+function renderMedals(){
+  $('#medCount').textContent=`${G.medals.length} / ${MEDALS.length} ميدالية 🏅`;
+  $('#medGrid').innerHTML=MEDALS.map(m=>{const got=G.medals.includes(m.id);
+    return `<div class="med ${got?'got':'lock'}"><b>${m.icon}</b><div class="mt">${m.name}</div>${m.desc}
+      <div class="pr">${got?`✅ ربحتيها (+${m.gift} د)`:`${Math.min(m.v(),m.n)}/${m.n} · 🎁 ${m.gift} د`}</div></div>`}).join('');
+}
+$('#medDone').onclick=()=>medBack();
+// share
+const GAME_URL='https://medo01012001.github.io/moroccan-kitchen/';
+let lastShare='';
+$('#deShare').onclick=async()=>{
+  const text=lastShare;
+  try{if(navigator.share){await navigator.share({title:'مطبخ المغرب',text,url:GAME_URL});return}}catch(e){if(e&&e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(text+'\n'+GAME_URL);toast(`📋 تكوبيات النتيجة! ${g('لصقها','لصقيها')} لصحابك`)}catch(e){toast('ما قدرناش نبارطاجيو 😅')}
+};
 function buildBook(){
   $('#bookTitle').textContent=`منيو المطعم ديال ${REGIONS[G.cur].city} 📖`;
   $('#book').innerHTML=menu().map(id=>{const r=R[id];
@@ -1214,10 +1457,10 @@ function renderCustomers(full){
   if(full||box.children.length!==3){
     box.innerHTML='';
     S.customers.forEach((c,i)=>{
-      const d=document.createElement('div');d.className='cust'+(c?' full':'');d.dataset.i=i;
+      const d=document.createElement('div');d.className='cust'+(c?' full':'')+(c&&c.vip?' vip':'');d.dataset.i=i;
       if(c){
         const r=R[c.dish];
-        d.innerHTML=`<div class="face">${c.face}</div><div class="name">${c.name}</div>
+        d.innerHTML=`${c.vip?'<div class="vipb">👑 VIP</div>':''}<div class="face">${c.face}</div><div class="name">${c.name}</div>
           <div class="bubble">${c.line}<span class="dish">${r.icon}</span>${r.name}${c.suf}</div>
           <div class="hint" title="الإرشاد">💡 ${r.ing.map(i=>ING[i][0]).join('')}</div>
           <div class="nos">❌ تقاضات السلعة<br>${g('كليكي','كليكي')} باش تلغي</div>
@@ -1234,7 +1477,7 @@ function renderCustomers(full){
       const p=Math.max(0,c.pat/c.max), bar=d.querySelector('.pat i');
       bar.style.width=(p*100)+'%';
       bar.style.background=p>.5?'var(--green)':p>.25?'var(--gold)':'var(--red)';
-      const face=d.querySelector('.face'), f=p<.25?'😡':c.face; if(face.textContent!==f)face.textContent=f;
+      const face=d.querySelector('.face'), f=S.cough>0?'😷':p<.25?'😡':c.face; if(face.textContent!==f)face.textContent=f;
     }
   });
 }
@@ -1252,7 +1495,7 @@ function renderStoves(full){
     }
     const bar=el.querySelector('.bar i');
     if(s.st==='cooking')bar.style.width=(s.t/R[s.dish].time*100)+'%';
-    if(s.st==='ready'){bar.style.width=(100-s.t/BURN*100)+'%';el.classList.toggle('warn',s.t>BURN-2.5)}
+    if(s.st==='ready'){bar.style.width=(100-s.t/burnT()*100)+'%';el.classList.toggle('warn',s.t>burnT()-2.5)}
   });
 }
 
@@ -1273,8 +1516,8 @@ $('#boardItems').addEventListener('click',e=>{
 $('#clearBtn').onclick=()=>{if(!running)return;S.board=[];renderBoard()};
 $('#trashBtn').onclick=()=>{if(!running)return;if(S.hand){S.hand=null;sfx.bad();renderHand();renderCustomers()}else toast('ما فيديك والو باش تلوح')};
 
-document.querySelectorAll('.stove').forEach(el=>el.addEventListener('click',()=>{
-  if(!running)return;
+$('#kitchen').addEventListener('click',e=>{
+  const el=e.target.closest('.stove'); if(!el||!running)return;
   const i=+el.dataset.i, s=S.stoves[i];
   if(s.st==='empty'){
     if(!S.board.length){toast(g('حط','حطي')+' شي عناصر فالطبلة لول 🧺');return}
@@ -1295,7 +1538,7 @@ document.querySelectorAll('.stove').forEach(el=>el.addEventListener('click',()=>
     S.hand=s.dish;S.stoves[i]={st:'empty'};sfx.pick();renderHand();renderCustomers();
   }else if(s.st==='burnt'){S.stoves[i]={st:'empty'};sfx.pick()}
   renderStoves();
-}));
+});
 
 $('#customers').addEventListener('click',e=>{
   const el=e.target.closest('.cust'); if(!el||!running)return;
@@ -1308,15 +1551,20 @@ $('#customers').addEventListener('click',e=>{
     renderCustomers(true);return;
   }
   if(!S.hand){toast(`${c.name} باغي ${R[c.dish].name} ${R[c.dish].icon}`);return}
-  if(S.hand!==c.dish){toast(`${c.name}: ماشي هادا اللي طلبت! 😠 (باغي ${R[c.dish].icon} ${R[c.dish].name})`);sfx.bad();say(c.vid,'wrong',true);S.wrong++;c.pat-=c.max*.25;breakCombo();return}
+  if(S.hand!==c.dish){toast(`${c.name}: ${wrongLine(c)}`);sfx.bad();buzz(80);say(c.vid,'wrong',true);S.wrong++;c.pat-=c.max*.25;breakCombo();return}
   say(c.vid,'thanks',true);
-  const r=R[c.dish], tip=Math.round(c.pat/c.max*10)*(evIs('rain')?2:1);
+  const r=R[c.dish];let tip=(Math.round(c.pat/c.max*10)+decorTip())*(evIs('rain')?2:1), salt='';
+  if(S.mamaSalt){S.mamaSalt=0;if(Math.random()<.65){tip+=10;salt=`${c.name}: "واو! شكون طيب هادي؟ بنينة بزاف 😋" (+10 بقشيش)`}else{tip=0;salt=`${c.name}: "مالحة شوية… شكون زاد الملحة؟ 😅🧂"`}}
+  if(c.vip)tip*=3;
   S.combo++;S.bestCombo=Math.max(S.bestCombo,S.combo);
-  const base=r.price*(evIs('wedding')?1.5:1), mult=comboMult(), total=Math.round((base+tip)*mult);
+  const base=r.price*(evIs('wedding')?1.5:1)*(c.vip?2:1)*(S.ftour?1.3:1), mult=comboMult(), total=Math.round((base+tip)*mult);
+  G.st.served++;if(c.dish==='atay'||c.dish==='sahtea')G.st.atay++;if(c.vip){S.vipServed++;G.st.vip++}
   S.money+=total;S.tips+=tip;S.bonus+=total-r.price-tip;S.served++;S.dishes[c.dish]=(S.dishes[c.dish]||0)+1;
   S.hand=null;S.customers[i]=null;
   floatText(`+${total} 💰${mult>1?' 🔥':''}`,el);sfx.coin();
-  if(S.combo===3)toast('🔥 كومبو ×3! الفلوس ×1.5');
+  if(salt)toast(salt);
+  else if(c.vip)toast(`👑 ${c.name}: "واعر! غادي نقول لصحابي كاملين" +${total} 🤩`);
+  else if(S.combo===3)toast('🔥 كومبو ×3! الفلوس ×1.5');
   else if(S.combo===5)toast(`🔥🔥 ${g('نتا','نتي')} واعر! كومبو ×5 — الفلوس دوبل!`);
   else if(S.combo>5&&S.combo%5===0)toast(`👑 كومبو ×${S.combo}! ما كاينش بحالك`);
   else toast(`${c.name}: شكرا! ${R[c.dish].icon} 😋`);
@@ -1347,9 +1595,14 @@ function spawn(){
   const pool=PEOPLE.filter(p=>!busy.includes(p[2]));
   // customers mostly order what you can still cook, but sometimes ask for something you ran out of
   const ok=menu().filter(canMake);
-  const [face,name,vid,line,suf]=pick(pool.length?pool:PEOPLE), r0=evIs('rain')?S.ev.dish:pick(ok.length&&Math.random()<.8?ok:menu()), id=r0, r=R[id];
-  const max=Math.max(22,50-diff()*2.5)+r.time*2;
-  S.customers[pick(free)]={face,name,vid,dish:id,pat:max,max,line,suf};
+  let [face,name,vid,line,suf]=pick(pool.length?pool:PEOPLE), vip=false;
+  if(!S.ramadan&&G.days>=1&&S.vipN<2&&S.time>10&&Math.random()<.13){const v=pick(VIPS);[face,name,vid,line]=v;suf='';vip=true;S.vipN++}
+  let id=evIs('rain')?S.ev.dish:pick(ok.length&&Math.random()<.8?ok:menu());
+  if(S.ftour){const rf=menu().filter(d=>FTOUR.includes(d)&&canMake(d));if(rf.length&&Math.random()<.6)id=pick(rf)}
+  const r=R[id];
+  const max=(Math.max(22,50-diff()*2.5)+r.time*2)*(vip?.6:1)*patMult();
+  S.customers[pick(free)]={face,name,vid,dish:id,pat:max,max,line,suf,vip};
+  if(vip){toast(`👑 VIP دخل: ${name}! ${g('خدمو','خدميه')} دغيا، كيخلص دوبل 💸`);sfx.fanfare();buzz(60)}
   beep(520,.08,'triangle',.08);
   say(vid,id);
   renderCustomers(true);
@@ -1373,21 +1626,27 @@ function tick(now){
   if(S.cat){S.cat.t+=dt;if(S.cat.t>=S.cat.life)catSteal()}
   if(S.evAt>0&&S.time>=S.evAt&&!S.ev&&S.time<DAY_LEN-12){S.evAt=-1;startEvent(pick(Object.keys(EVENTS)))}
   if(S.ev)updateEvent(dt);
-  S.spawnT-=dt*(evIs('wedding')?3:1);
+  if(S.ramadan)updateRamadan();
+  if(S.mamaAt>0&&S.time>=S.mamaAt&&S.time<DAY_LEN){S.mamaAt=-1;spawnMama()}
+  if(S.mama){S.mama.t+=dt;if(!S.mama.done&&S.mama.t>=1.4)mamaAct();if(S.mama.t>=6)removeMama()}
+  if(S.cough>0)S.cough-=dt;
+  if(!running)return; // tutorial opened at ftour
+  S.spawnT-=dt*(evIs('wedding')?3:1)*(S.ramadan?(S.ftour?2.5:.3):1);
   if(S.spawnT<=0&&DAY_LEN-S.time>8){spawn();S.spawnT=Math.max(3.2,9.5-diff()*.5)*(0.8+Math.random()*.4)}
   if(!running)return; // tutorial opened
   S.customers.forEach((c,i)=>{
     if(!c)return;
     c.pat-=dt;
     if(c.pat<=0){
-      S.customers[i]=null;S.hearts--;S.angry++;sfx.bad();say(c.vid,'angry',true);breakCombo();
-      toast(`${c.name} مشا معصب 😤`);renderStats();renderCustomers(true);
+      S.customers[i]=null;S.hearts--;S.angry++;sfx.bad();say(c.vid,'angry',true);breakCombo();buzz(150);
+      toast(c.vip?`👑 ${c.name} مشا معصب… وغادي يكتب عليك فالأنستا 😱`:`${c.name} مشا معصب 😤`);renderStats();renderCustomers(true);
     }
   });
   if(S.hearts<=0){endDay(true);return}
   S.stoves.forEach((s,i)=>{
-    if(s.st==='cooking'){s.t+=dt*(evIs('power')?.45:1);if(s.t>=R[s.dish].time){S.stoves[i]={st:'ready',dish:s.dish,t:0};sfx.ready()}}
-    else if(s.st==='ready'){s.t+=dt;if(s.t>=BURN){S.stoves[i]={st:'burnt'};S.burnt++;sfx.burn();toast('أويلي! الماكلة تحرقات 🔥');breakCombo()}}
+    if(s.st==='cooking'){s.t+=dt*(evIs('power')?(hasD('lantern')?.75:.45):1)*cookMult();if(s.t>=R[s.dish].time){S.stoves[i]={st:'ready',dish:s.dish,t:0};sfx.ready()}}
+    else if(s.st==='ready'){s.t+=dt;if(s.t>=burnT()){S.stoves[i]={st:'burnt'};S.burnt++;sfx.burn();setTimeout(sfx.cough,350);buzz([200,80,200]);
+      const se=document.querySelectorAll('.stove')[i];if(se)smokeBurst(se);S.cough=2.5;toast(pick(BURN_LINES));breakCombo()}}
   });
   renderCustomers();renderStoves();
   if(running)requestAnimationFrame(tick);
@@ -1477,8 +1736,10 @@ function dayIntro(){
   setAudioMode('region');
   const low=menuIngs().filter(k=>stk(k)<=2);
   $('#diTitle').textContent=`📍 ${r.city} — النهار ${d}`;
+  $('#dayScr .big').textContent=S.ramadan?'🌙':'☀️';
   $('#diTxt').innerHTML=`صباح الخير يا ${chefName()}! ${G.avatar}<br>🎯 الهدف ديال اليوم: <b>${target()} درهم</b> ربح صافي<br>`+
     `🏦 فالصندوق: <b>${G.bank} درهم</b><br>`+gift+
+    (S.ramadan?`<b style="color:var(--teal)">🌙 رمضان مبارك! اليوم نهار رمضان: الصباح هادي، ومع أذان المغرب كيجيو الكليان كاملين والفلوس +30%</b><br>`:'')+
     (low.length?`<span style="color:var(--red);font-weight:900">⚠️ قربات تقاضا: ${low.map(k=>ING[k][0]+stk(k)).join(' ')} — ${g('دوز','دوزي')} للسوق 🛒</span><br>`:'')+
     (nw.length?`🆕 كاين ماكلة جديدة غادي تتعلمها: ${nw.map(x=>R[x].icon).join(' ')}<br>`:'')+
     `🎵 الموسيقى ديال الجهة: <b>${STYLES[REGION_STYLE[G.cur]].name}</b><br>`+
@@ -1496,6 +1757,7 @@ function summaryRows(net,tg){
     <tr><td>❌ غلطات فالطلبات</td><td>${S.wrong}</td></tr>
     ${S.cancel?`<tr><td>🚫 طلبيات تلغات (السلعة تقاضات)</td><td>${S.cancel}</td></tr>`:''}
     ${S.bestCombo>=2?`<tr><td>🔥 أحسن كومبو</td><td>×${S.bestCombo}</td></tr>`:''}
+    ${S.vipServed?`<tr><td>👑 VIP خدمتيهم</td><td>${S.vipServed}</td></tr>`:''}
     ${S.catShoo||S.catStole?`<tr><td>🐈 القط: هربتيه / سرق</td><td>${S.catShoo} / ${S.catStole}</td></tr>`:''}
     <tr><td>💵 المدخول</td><td class="pos">+${S.money-S.tips-S.bonus}</td></tr>
     <tr><td>🪙 البقشيش</td><td class="pos">+${S.tips}</td></tr>
@@ -1509,7 +1771,15 @@ function endDay(closed){
   const stars=closed?0:net>=tg*2?3:net>=tg*1.5?2:net>=tg?1:0;
   const dayN=G.rdays[G.cur]+1;
   G.bank+=S.money; // ingredients were already paid at the market
+  ensureG();G.st.combo=Math.max(G.st.combo,S.bestCombo);
+  if(!closed&&S.burnt===0&&S.served>=6)G.st.noburn++;
+  if(stars===3)G.st.stars3++;
+  if(S.ramadan&&!closed)G.st.ramadan++;
+  const nm=checkMedals();
   G.days++;G.rdays[G.cur]++;save();updRec();
+  $('#deMed').innerHTML=nm.length?`🏅 ${nm.length>1?'ميداليات جداد':'ميدالية جديدة'}!<div class="medtoast">${nm.map(m=>`<span>${m.icon} ${m.name} +${m.gift}د</span>`).join('')}</div>`:'';
+  $('#deMed').classList.toggle('hidden',!nm.length);if(nm.length)setTimeout(sfx.fanfare,500);
+  lastShare=`🍲 مطبخ المغرب\n${G.avatar} ${chefName()} — ${REGIONS[G.cur].city}، النهار ${dayN}${S.ramadan?' 🌙':''}\n${'⭐'.repeat(stars)||'😅'} ربحت ${net} درهم${S.bestCombo>=3?` · 🔥 كومبو ×${S.bestCombo}`:''}\n🏪 ${G.owned}/12 مطاعم · 🏅 ${G.medals.length} ميدالية\nواش تقدر تغلبني؟ 😏`;
   $('#deTitle').textContent=`سالا النهار ${dayN} فـ${REGIONS[G.cur].city}`;
   $('#deStars').innerHTML=[1,2,3].map(i=>`<span class="${i<=stars?'':'off'}" style="animation-delay:${i*.2}s">⭐</span>`).join('');
   $('#deMsg').textContent=closed?'😬 مشاو ٣ ديال الكليان معصبين، سديتي بكري اليوم!':
@@ -1529,7 +1799,7 @@ let draft={gender:'f',avatar:AVATARS.f[0]};
 function showMenu(){
   running=false;setAudioMode('menu');resetFun();
   const sv=loadSave()||(G&&G.name?G:null), rec=getRec();
-  $('#contBtn').classList.toggle('hidden',!sv);
+  $('#contBtn').classList.toggle('hidden',!sv);$('#medBtn').classList.toggle('hidden',!sv);
   $('#chefCard').classList.toggle('hidden',!sv);
   if(sv){
     G=sv;
@@ -1572,16 +1842,21 @@ $('#deNext').onclick=()=>dayIntro();
 $('#diMkt').onclick=()=>openMarket(dayIntro);
 $('#deMkt').onclick=()=>openMarket(dayIntro);
 $('#deMap').onclick=()=>showMap(G.cur);
+$('#diShop').onclick=()=>openShop(dayIntro);
+$('#deShop').onclick=()=>openShop(dayIntro);
+$('#diMed').onclick=()=>openMedals(dayIntro);
+$('#medBtn').onclick=()=>{const sv=loadSave()||(G&&G.name?G:null);if(sv){G=sv;openMedals(showMenu)}};
 document.querySelectorAll('[data-menu]').forEach(b=>b.onclick=showMenu);
 
 // boot
 let setWasRunning=false;
 function renderSettings(){
-  document.querySelectorAll('.setrow').forEach(r=>{
+  document.querySelectorAll('.setrow[data-k]').forEach(r=>{
     const v=AUD.vol[r.dataset.k];r.classList.toggle('off',!v.on);
     const b=r.querySelector('.tog');b.textContent=v.on?'✅ مشعولة':'❌ مطفية';b.classList.toggle('off',!v.on);
     r.querySelector('input').value=v.v;
   });
+  const vb=$('#vibRow .tog');vb.textContent=VIB?'✅ مشعولة':'❌ مطفية';vb.classList.toggle('off',!VIB);$('#vibRow').classList.toggle('off',!VIB);
   $('#nowPlaying').textContent='🎵 الموسيقى دابا: '+(STYLES[MUS.styleId]||STYLES.menu).name;
 }
 function openSettings(){
@@ -1594,7 +1869,9 @@ function closeSettings(){
   $('#setScr').classList.add('hidden');
   if(setWasRunning){setWasRunning=false;running=true;last=performance.now();requestAnimationFrame(tick)}
 }
-document.querySelectorAll('.setrow').forEach(r=>{
+if(!navigator.vibrate)$('#vibRow').classList.add('hidden');
+$('#vibRow .tog').onclick=()=>{VIB=!VIB;try{localStorage.setItem('matbakh_vib',VIB?'1':'0')}catch(e){}renderSettings();buzz(80)};
+document.querySelectorAll('.setrow[data-k]').forEach(r=>{
   const k=r.dataset.k;
   r.querySelector('.tog').onclick=()=>{AUD.vol[k].on=!AUD.vol[k].on;applyVolumes();renderSettings();if(k==='voices'&&!AUD.vol[k].on)stopVoices()};
   r.querySelector('input').oninput=e=>{AUD.vol[k].v=+e.target.value;AUD.vol[k].on=true;applyVolumes();renderSettings()};
