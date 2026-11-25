@@ -1083,11 +1083,25 @@ const sfx={
   fanfare:()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle',.12),i*130)),
   meow:(angry)=>{try{
     if(!AC)return;
-    const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime,d=angry?.32:.45;
-    o.type='triangle';
-    o.frequency.setValueAtTime(angry?900:550,t);o.frequency.linearRampToValueAtTime(angry?1300:950,t+d*.35);o.frequency.linearRampToValueAtTime(angry?700:480,t+d);
-    g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(.14,t+.05);g.gain.exponentialRampToValueAtTime(.001,t+d);
-    o.connect(g);g.connect(AUD.sfxBus);o.start(t);o.stop(t+d+.02);
+    // "mi-a-ou": a buzzy voice (sawtooth + vibrato) shaped by two moving formants, like a real cat
+    const t=AC.currentTime+(angry?.18:0), d=(angry?.5:.75)*(.9+Math.random()*.2), p=1+(Math.random()-.5)*.15;
+    const o=AC.createOscillator(),lfo=AC.createOscillator(),lg=AC.createGain(),out=AC.createGain();
+    o.type='sawtooth';
+    const f0=(angry?640:500)*p,f1=(angry?980:820)*p,f2=(angry?520:420)*p;
+    o.frequency.setValueAtTime(f0,t);o.frequency.linearRampToValueAtTime(f1,t+d*.35);o.frequency.linearRampToValueAtTime(f2,t+d);
+    lfo.frequency.value=angry?9:6;lg.gain.value=angry?25:12;lfo.connect(lg);lg.connect(o.frequency);
+    [[[700,1150,520],5,1],[[1900,2500,1000],7,.55]].forEach(([fr,q,v])=>{
+      const bp=AC.createBiquadFilter(),gv=AC.createGain();bp.type='bandpass';bp.Q.value=q;gv.gain.value=v;
+      bp.frequency.setValueAtTime(fr[0],t);bp.frequency.linearRampToValueAtTime(fr[1],t+d*.4);bp.frequency.linearRampToValueAtTime(fr[2],t+d);
+      o.connect(bp);bp.connect(gv);gv.connect(out);
+    });
+    out.gain.setValueAtTime(.0001,t);out.gain.exponentialRampToValueAtTime(angry?.9:.75,t+.07);
+    out.gain.setValueAtTime(angry?.9:.75,t+d*.6);out.gain.exponentialRampToValueAtTime(.0001,t+d);
+    out.connect(AUD.sfxBus);o.start(t);lfo.start(t);o.stop(t+d+.05);lfo.stop(t+d+.05);
+    if(angry&&AUD.noise){ // hiss "khhh" before the angry meow
+      const n=noiseSrc(AC.currentTime,.22),hp=AC.createBiquadFilter(),hg=AC.createGain();hp.type='highpass';hp.frequency.value=2500;
+      n.connect(hp);hp.connect(hg);hg.connect(AUD.sfxBus);env(hg,AC.currentTime,.35,.02,.2);
+    }
   }catch(e){}},
   cough:()=>{try{if(!AC||!AUD.noise)return;[0,.24,.44].forEach(dl=>{const t=AC.currentTime+dl,src=noiseSrc(t,.17),f=AC.createBiquadFilter(),gn=AC.createGain();
     f.type='bandpass';f.frequency.value=800+Math.random()*300;f.Q.value=1.3;src.connect(f);f.connect(gn);gn.connect(AUD.sfxBus);env(gn,t,.4,.01,.15)})}catch(e){}},
@@ -1254,8 +1268,8 @@ function spawnCat(){
     S.cat=null;S.catShoo++;G.st.cats++;sfx.meow(true);toast(pick(['سير فحالك يا المش! 😾','بششش! هرب القط 🐈💨','ماشي اليوم أ المش 😼']));
     c.classList.add('run');setTimeout(()=>c.remove(),600)});
   board.appendChild(c);
-  S.cat={t:0,life:Math.max(3.2,5-diff()*.15)};
-  sfx.meow();toast(`🐈 مش دخل للكوزينة! ${g('كليكي','كليكي')} عليه قبل ما يسرق`);
+  S.cat={t:0,life:Math.max(3.2,5-diff()*.15),nextM:2.2};
+  sfx.meow();setTimeout(()=>{if(S.cat)sfx.meow()},850);toast(`🐈 مش دخل للكوزينة! ${g('كليكي','كليكي')} عليه قبل ما يسرق`);
 }
 function removeCat(){const c=$('#cat');if(c)c.remove()}
 function catSteal(){
@@ -1623,7 +1637,7 @@ function tick(now){
   }
   // thieving cat & random events
   if(S.catAt>0&&S.time>=S.catAt&&!S.cat&&S.time<DAY_LEN){S.catAt=S.cat2At||-1;S.cat2At=0;spawnCat()}
-  if(S.cat){S.cat.t+=dt;if(S.cat.t>=S.cat.life)catSteal()}
+  if(S.cat){S.cat.t+=dt;if(S.cat.t>=S.cat.nextM){S.cat.nextM+=1.3;sfx.meow()}if(S.cat.t>=S.cat.life)catSteal()}
   if(S.evAt>0&&S.time>=S.evAt&&!S.ev&&S.time<DAY_LEN-12){S.evAt=-1;startEvent(pick(Object.keys(EVENTS)))}
   if(S.ev)updateEvent(dt);
   if(S.ramadan)updateRamadan();
