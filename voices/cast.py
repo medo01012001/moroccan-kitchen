@@ -42,6 +42,38 @@ CAST = [
   'السلام بغيت','', 'مزيان شكرا','هادشي غالط ماشي هادا اللي طلبت','تعطلتو بزاف مشيت'),
  ('farmer','🧑‍🌾','عمي الفلاح','Umbriel','A simple, kind Moroccan farmer from the countryside with a rural accent, ordering food.',
   'الله يعاونك بغيت','', 'الله يبارك فيك بحال ماكلة البلاد','لا لا ماشي هادي اللي طلبت','خليت البهايم بوحدهم مشيت'),
+ # VIP guests (appear in any region)
+ ('vip_foot','⚽','لاعب المنتخب','Alnilam','A famous young Moroccan national-team football player, energetic and confident, in a hurry to get to training, ordering food.',
+  'أنا زْرْبان عندي التدريب بغيت','', 'واعر غادي نقول لصحابي كاملين','لا لا خويا ماشي هادشي اللي طلبت','مشيت وغادي نكتب عليكم فالأنستا'),
+ ('vip_singer','🎤','المغنية المشهورة','Laomedeia','A famous Moroccan pop singer, glamorous, lively and a bit diva, in a hurry before her concert, ordering food.',
+  'عافاك دغيا عندي سهرة بغيت','', 'واعر غادي نقول لصحاباتي كاملين','أويلي ماشي هادشي اللي طلبت','مشيت وغادي نكتب عليكم فالأنستا'),
+ ('vip_actor','🎬','الممثل ديال المسلسل','Iapetus','A famous Moroccan TV-series actor, dramatic and theatrical, the cameras are waiting for him, ordering food.',
+  'الكاميرات كيتسناوني بغيت','', 'واعر غادي نقول لصحابي كاملين','لا لا ماشي هادا اللي طلبت','مشيت وغادي نكتب عليكم فالأنستا'),
+ ('vip_chaabi','🕺','الفنان الشعبي','Sadachbia','A famous, joyful Moroccan chaabi folk singer, loud and funny, full of life, ordering food.',
+  'آ الشريف بغيت','', 'واعر غادي نقول لصحابي كاملين','آ الشريف ماشي هادشي اللي طلبت','مشيت وغادي نكتب عليكم فالأنستا'),
+]
+
+# the chef's mother: (clip name, text)
+MAMA_VOICE = 'Vindemiatrix'
+MAMA_WHO = 'A loving but bossy old Moroccan mother visiting the restaurant kitchen of her child, expressive and funny.'
+MAMA = [
+ ('enter_m','السلام ولدي! شنو كتطيب؟'),
+ ('enter_f','السلام بنتي! شنو كتطيبي؟'),
+ ('finish','ماشي هاكا كيطيبو! عطيني نوريك'),
+ ('clean_m','آش هاد الدخان؟ جيب شي حاجة نقي ليك هاد الروينة'),
+ ('clean_f','آش هاد الدخان؟ جيبي شي حاجة نقي ليك هاد الروينة'),
+ ('gift_m','جبت ليك شوية السلعة من الدار، ما تقولش ما عندكش'),
+ ('gift_f','جبت ليك شوية السلعة من الدار، ما تقوليش ما عندكش'),
+ ('salt_m','زدت ليك شوية الملحة، ما تقول والو'),
+ ('salt_f','زدت ليك شوية الملحة، ما تقولي والو'),
+ ('tip1_m','ولدي، عطي اللول للكليان اللي قرب يسالي ليه الصبر'),
+ ('tip1_f','بنتي، عطيي اللول للكليان اللي قرب يسالي ليه الصبر'),
+ ('tip2','ما تخليش الماكلة فالكانون، راه كتحرق'),
+ ('tip3_m','سير للسوق قبل ما تقاضا السلعة'),
+ ('tip3_f','سيري للسوق قبل ما تقاضا السلعة'),
+ ('tip4_m','الله يرضي عليك أولدي، كمل هاكا'),
+ ('tip4_f','الله يرضي عليك أبنتي، كملي هاكا'),
+ ('tip5','فزماني كنا كنطيبو للعرس كامل بكانون واحد'),
 ]
 
 def lines(c):
@@ -53,6 +85,10 @@ def script(c, lo=0, hi=None):
     return ' <long pause> <long pause> '.join(l + ('' if l.endswith('؟') else '.') for l in lines(c)[lo:hi])
 
 if __name__ == '__main__':
+    if sys.argv[1] == 'mama':
+        print(MAMA_VOICE); print(BASE.format(who=MAMA_WHO))
+        print(' <long pause> <long pause> '.join(t + ('' if t.endswith('؟') else '.') for _, t in MAMA))
+        sys.exit()
     if sys.argv[1] == 'json':
         print(json.dumps([{'id':c[0],'face':c[1],'name':c[2],'opener':c[5],'suf':c[6]} for c in CAST], ensure_ascii=False))
     else:

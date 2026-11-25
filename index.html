@@ -1314,30 +1314,32 @@ function wrongLine(c){
     `الله يهديك… ${W} قلت ليك، ماشي ${got.name} 🙄`,`واش ${g('ناعس','ناعسة')}؟ 😴 بغيت ${W}`,`${g('سمعني','سمعيني')} مزيان: ${W}! 👂`]);
 }
 // mama
-const MAMA_TIPS=()=>[`${g('ولدي','بنتي')}، ${g('عطي','عطيي')} اللول للكليان اللي قرب يسالي ليه الصبر`,`ما تخليش الماكلة فالكانون، راه كتحرق! 🔥`,
-  `${g('سير','سيري')} للسوق قبل ما تقاضا السلعة 🛒`,`الله يرضي عليك ${g('أولدي','أبنتي')}، ${g('كمل','كملي')} هاكا 🤲`,`فزماني كنا كنطيبو للعرس كامل بكانون واحد! 😤`];
+// [bubble text, voice clip] — voices/mama/<clip>.mp3
+const MAMA_TIPS=()=>[[`${g('ولدي','بنتي')}، ${g('عطي','عطيي')} اللول للكليان اللي قرب يسالي ليه الصبر`,g('tip1_m','tip1_f')],[`ما تخليش الماكلة فالكانون، راه كتحرق! 🔥`,'tip2'],
+  [`${g('سير','سيري')} للسوق قبل ما تقاضا السلعة 🛒`,g('tip3_m','tip3_f')],[`الله يرضي عليك ${g('أولدي','أبنتي')}، ${g('كمل','كملي')} هاكا 🤲`,g('tip4_m','tip4_f')],[`فزماني كنا كنطيبو للعرس كامل بكانون واحد! 😤`,'tip5']];
 function spawnMama(){
   const m0=$('#mama');if(m0)m0.remove();
-  const m=document.createElement('div');m.id='mama';m.innerHTML='👵<small>السلام! شنو كتطيب؟ 👀</small>';
+  const m=document.createElement('div');m.id='mama';m.innerHTML=`👵<small>${g('السلام ولدي! شنو كتطيب؟','السلام بنتي! شنو كتطيبي؟')} 👀</small>`;
   $('#kitchen').appendChild(m);S.mama={t:0,done:false};
-  toast('👵 الماما دخلات للكوزينة!');beep(440,.1,'triangle',.08);
+  toast('👵 الماما دخلات للكوزينة!');beep(440,.1,'triangle',.08);say('mama',g('enter_m','enter_f'),true);
 }
-function mamaSay(t){const m=$('#mama');if(m)m.querySelector('small').textContent=t}
+function mamaSay(t,clip){const m=$('#mama');if(m)m.querySelector('small').textContent=t;if(clip)say('mama',clip,true)}
 function mamaAct(){
   S.mama.done=true;
   const ci=S.stoves.findIndex(s=>s.st==='cooking'), bi=S.stoves.findIndex(s=>s.st==='burnt'), low=menuIngs().filter(k=>stk(k)<=1), r=Math.random();
-  if(bi>=0&&r<.75){S.stoves[bi]={st:'empty'};renderStoves(true);mamaSay('آش هاد الدخان؟! جيب نقيه ليك 🧽');toast('👵 الماما نقات الكانون المحروق')}
+  if(bi>=0&&r<.75){S.stoves[bi]={st:'empty'};renderStoves(true);mamaSay(`آش هاد الدخان؟! ${g('جيب','جيبي')} شي حاجة نقي ليك هاد الروينة 🧽`,g('clean_m','clean_f'));toast('👵 الماما نقات الكانون المحروق')}
   else if(ci>=0&&r<.5){const s=S.stoves[ci];S.stoves[ci]={st:'ready',dish:s.dish,t:0};sfx.ready();renderStoves(true);
-    mamaSay('ماشي هاكا كيطيبو! عطيني نوري ليك 😤');toast(`👵 الماما كملات ${R[s.dish].icon} ${R[s.dish].name} فدقة!`)}
+    mamaSay('ماشي هاكا كيطيبو! عطيني نوريك 😤','finish');toast(`👵 الماما كملات ${R[s.dish].icon} ${R[s.dish].name} فدقة!`)}
   else if(low.length&&r<.75){const k=pick(low);giveStock([k],3);save();renderStock();
-    mamaSay(`جبت ليك ${ING[k][0]} من الدار، ما تقولش ما عندكش!`);toast(`👵 الماما جابت ليك 3 ديال ${ING[k][0]} ${ING[k][1]} 🎁`)}
-  else if(r<.6){S.mamaSalt=1;mamaSay('زدت ليك شوية الملحة… ما تقول والو 🤫🧂');toast('🧂 الماما زادت الملحة بلا ما تقولك… الكليان الجاي غادي يحكم!')}
-  else mamaSay(pick(MAMA_TIPS()));
+    mamaSay(`جبت ليك شوية السلعة من الدار ${ING[k][0]}، ما ${g('تقولش','تقوليش')} ما عندكش!`,g('gift_m','gift_f'));toast(`👵 الماما جابت ليك 3 ديال ${ING[k][0]} ${ING[k][1]} 🎁`)}
+  else if(r<.6){S.mamaSalt=1;mamaSay(`زدت ليك شوية الملحة… ما ${g('تقول','تقولي')} والو 🤫🧂`,g('salt_m','salt_f'));toast('🧂 الماما زادت الملحة بلا ما تقولك… الكليان الجاي غادي يحكم!')}
+  else mamaSay(...pick(MAMA_TIPS()));
 }
 function removeMama(){S.mama=null;const m=$('#mama');if(m){m.classList.add('run');setTimeout(()=>m.remove(),700)}}
 // VIP
-const VIPS=[['⚽','لاعب المنتخب','yassine','أنا مستعجل، عندي التدريب! بغيت'],['🎤','المغنية المشهورة','khadija','عافاك دغيا، عندي سهرة! بغيت'],
-  ['🎬','الممثل ديال المسلسل','mohamed','الكاميرات كيتسناوني، بغيت'],['🕺','الفنان الشعبي','arbi','آ الشريف! بغيت']];
+// [face, name, voice folder, opener, gender]
+const VIPS=[['⚽','لاعب المنتخب','vip_foot','أنا زربان، عندي التدريب! بغيت','m'],['🎤','المغنية المشهورة','vip_singer','عافاك دغيا، عندي سهرة! بغيت','f'],
+  ['🎬','الممثل ديال المسلسل','vip_actor','الكاميرات كيتسناوني، بغيت','m'],['🕺','الفنان الشعبي','vip_chaabi','آ الشريف! بغيت','m']];
 // ramadan
 const isRamadan=()=>G.days>0&&(G.days+1)%6===0;
 const FTOUR=['harira','atay','sahtea','datemilk','camelmilk','sellou','msemen','bissara','zrig','orange','seffa'];
@@ -1577,7 +1579,7 @@ $('#customers').addEventListener('click',e=>{
   S.hand=null;S.customers[i]=null;
   floatText(`+${total} 💰${mult>1?' 🔥':''}`,el);sfx.coin();
   if(salt)toast(salt);
-  else if(c.vip)toast(`👑 ${c.name}: "واعر! غادي نقول لصحابي كاملين" +${total} 🤩`);
+  else if(c.vip)toast(`👑 ${c.name}: "واعر! غادي نقول ${c.vip==='f'?'لصحاباتي':'لصحابي'} كاملين" +${total} 🤩`);
   else if(S.combo===3)toast('🔥 كومبو ×3! الفلوس ×1.5');
   else if(S.combo===5)toast(`🔥🔥 ${g('نتا','نتي')} واعر! كومبو ×5 — الفلوس دوبل!`);
   else if(S.combo>5&&S.combo%5===0)toast(`👑 كومبو ×${S.combo}! ما كاينش بحالك`);
@@ -1610,13 +1612,13 @@ function spawn(){
   // customers mostly order what you can still cook, but sometimes ask for something you ran out of
   const ok=menu().filter(canMake);
   let [face,name,vid,line,suf]=pick(pool.length?pool:PEOPLE), vip=false;
-  if(!S.ramadan&&G.days>=1&&S.vipN<2&&S.time>10&&Math.random()<.13){const v=pick(VIPS);[face,name,vid,line]=v;suf='';vip=true;S.vipN++}
+  if(!S.ramadan&&G.days>=1&&S.vipN<2&&S.time>10&&Math.random()<.13){const v=pick(VIPS);[face,name,vid,line]=v;suf='';vip=v[4];S.vipN++}
   let id=evIs('rain')?S.ev.dish:pick(ok.length&&Math.random()<.8?ok:menu());
   if(S.ftour){const rf=menu().filter(d=>FTOUR.includes(d)&&canMake(d));if(rf.length&&Math.random()<.6)id=pick(rf)}
   const r=R[id];
   const max=(Math.max(22,50-diff()*2.5)+r.time*2)*(vip?.6:1)*patMult();
   S.customers[pick(free)]={face,name,vid,dish:id,pat:max,max,line,suf,vip};
-  if(vip){toast(`👑 VIP دخل: ${name}! ${g('خدمو','خدميه')} دغيا، كيخلص دوبل 💸`);sfx.fanfare();buzz(60)}
+  if(vip){toast(vip==='f'?`👑 VIP دخلات: ${name}! ${g('خدمها','خدميها')} دغيا، كتخلص دوبل 💸`:`👑 VIP دخل: ${name}! ${g('خدمو','خدميه')} دغيا، كيخلص دوبل 💸`);sfx.fanfare();buzz(60)}
   beep(520,.08,'triangle',.08);
   say(vid,id);
   renderCustomers(true);
@@ -1653,7 +1655,7 @@ function tick(now){
     c.pat-=dt;
     if(c.pat<=0){
       S.customers[i]=null;S.hearts--;S.angry++;sfx.bad();say(c.vid,'angry',true);breakCombo();buzz(150);
-      toast(c.vip?`👑 ${c.name} مشا معصب… وغادي يكتب عليك فالأنستا 😱`:`${c.name} مشا معصب 😤`);renderStats();renderCustomers(true);
+      toast(c.vip==='f'?`👑 ${c.name} مشات معصبة… وغادي تكتب عليك فالأنستا 😱`:c.vip?`👑 ${c.name} مشا معصب… وغادي يكتب عليك فالأنستا 😱`:`${c.name} مشا معصب 😤`);renderStats();renderCustomers(true);
     }
   });
   if(S.hearts<=0){endDay(true);return}

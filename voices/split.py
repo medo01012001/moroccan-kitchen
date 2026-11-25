@@ -7,10 +7,14 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(__file__))
 from cast import CAST, DISHES, lines
 
-src, ci = sys.argv[1], int(sys.argv[2])
-c = CAST[ci]; cid = c[0]
-texts = lines(c)
-names = ['thanks', 'wrong', 'angry'] + [d for d, _ in DISHES]
+from cast import MAMA
+src = sys.argv[1]
+if sys.argv[2] == 'mama':
+    cid = 'mama'; texts = [t for _, t in MAMA]; names = [n for n, _ in MAMA]
+else:
+    c = CAST[int(sys.argv[2])]; cid = c[0]
+    texts = lines(c)
+    names = ['thanks', 'wrong', 'angry'] + [d for d, _ in DISHES]
 lo = int(sys.argv[3]) if len(sys.argv) > 3 else 0
 hi = int(sys.argv[4]) if len(sys.argv) > 4 else len(names)
 texts, names = texts[lo:hi], names[lo:hi]
