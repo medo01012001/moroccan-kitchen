@@ -402,6 +402,82 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
   .evbar{max-width:60px;height:6px}
   #cat{font-size:38px;top:-28px}
 }
+
+/* ---- phone: the whole kitchen fits one screen on small and big phones ---- */
+#bookBtn{display:none}
+@media (max-width:600px){
+  #app{min-height:100dvh;display:flex;flex-direction:column;padding:4px 5px calc(4px + env(safe-area-inset-bottom))}
+  header{padding:3px 6px 3px 84px;min-height:42px;flex-wrap:nowrap}
+  header h1{display:none}
+  .stats{flex:1;min-width:0;flex-wrap:nowrap;gap:3px;font-size:clamp(10px,3.1vw,13px);justify-content:space-around}
+  .stats .stat:first-child,.stats .stat:last-child{display:none}
+  .stats .dl{display:none}
+  #comboStat{position:fixed;top:46px;left:8px;z-index:16;font-size:12px;font-weight:900;color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+  .stat{padding:1px 5px}
+  .goal{width:clamp(26px,8vw,46px)}
+  .sect{margin-top:4px;padding:5px}
+  .sect h2{display:none}
+  #decorRow{font-size:15px;margin:0 0 3px}
+  #customers{gap:4px}
+  /* big phones: customers and kitchen grow to use the free height */
+  #custSect{flex:1 1 auto;display:flex;flex-direction:column}
+  #custSect #customers{flex:1}
+  #kitSect{flex:1 1 auto;display:flex;flex-direction:column}
+  #kitSect #kitchen{flex:1;grid-template-rows:1fr auto}
+  .cust{min-height:clamp(88px,16.5dvh,170px);padding:3px 2px;justify-content:space-evenly}
+  .cust .face{font-size:clamp(22px,4.4dvh,40px)}
+  .cust .name{font-size:clamp(9px,1.5dvh,12px)}
+  .bubble{font-size:clamp(10px,1.6dvh,13px);padding:1px 4px;margin-top:1px}
+  .bubble .ln{display:none}
+  .bubble .dish{font-size:clamp(18px,3.5dvh,32px)}
+  .hint{font-size:clamp(10px,1.7dvh,14px);margin-top:2px}
+  .cust .nos{font-size:10px;line-height:1.25}
+  #kitchen{gap:4px}
+  .stove{min-height:clamp(64px,12dvh,130px);padding:3px}
+  .stove .fire{font-size:clamp(9px,1.4dvh,13px)}
+  .stove .pot{font-size:clamp(24px,4.8dvh,46px);line-height:1.05}
+  .stove .lbl{font-size:clamp(9px,1.5dvh,12px);line-height:1.25}
+  .stove .bar{height:5px;margin-top:3px}
+  .board{padding:3px 5px}
+  .board .title{display:none}
+  #boardItems{font-size:clamp(18px,3.4dvh,28px);min-height:28px}
+  #boardItems:empty::before,#boardItems small{font-size:11px}
+  .btn{padding:4px 7px}
+  #hand{margin-top:4px;font-size:clamp(11px,1.9dvh,14px);padding:2px}
+  #ings{grid-template-columns:repeat(auto-fill,minmax(clamp(44px,13vw,64px),1fr));gap:4px}
+  .ing b{font-size:clamp(19px,3.7dvh,32px);line-height:1.15}
+  .ing small{font-size:clamp(8.5px,1.4dvh,11px)}
+  .ing .cnt{font-size:9px;min-width:15px;line-height:14px;padding:0 3px}
+  #bookSect{display:none}
+  body.showbook #bookSect{display:block;position:fixed;left:6px;right:6px;bottom:6px;max-height:62dvh;overflow:auto;z-index:18;margin:0;
+    box-shadow:0 -6px 24px rgba(0,0,0,.35);border-color:var(--gold)}
+  body.showbook #bookSect h2{display:block;font-size:13px}
+  #bookBtn{display:block;position:fixed;top:8px;left:48px;z-index:15;width:34px;height:34px;border-radius:50%;border:2px solid var(--gold);
+    background:var(--teal);color:#fff;font-size:16px;cursor:pointer;box-shadow:0 3px 0 #134a50;padding:0}
+  #setBtn{width:34px;height:34px;font-size:16px}
+  #evBanner{margin-top:4px}
+  #cat{font-size:34px;top:-26px}
+  #mama{font-size:30px;top:-24px}
+}
+@media (max-width:380px){.stats .goal{display:none}.stats{font-size:10px;gap:2px}.stat{padding:0 4px}#hearts{letter-spacing:-3px;padding-left:6px}}
+@media (max-width:600px) and (min-height:700px){#custSect{max-height:28dvh}#kitSect{max-height:31dvh}}
+/* very short screens (small phones, or a browser bar eating the height) */
+@media (max-width:600px) and (max-height:600px){
+  .hint{display:none}
+  .cust .name{display:none}
+  .stove .fire{display:none}
+  #ings{grid-template-columns:repeat(auto-fill,minmax(40px,1fr))}
+  .ing small{display:none}
+  .ing{padding:3px 1px}
+}
+/* wide phones in landscape: kitchen and ingredients side by side */
+@media (max-height:500px) and (orientation:landscape){
+  #app{max-width:none;padding:4px 8px}
+  .sect h2{display:none}
+  .sect{margin-top:4px;padding:5px}
+  .cust{min-height:96px}
+  .stove{min-height:76px}
+}
 </style>
 </head>
 <body>
@@ -420,13 +496,13 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
   </header>
   <div id="evBanner" class="hidden"><b id="evIcon"></b><div><div id="evName"></div><small id="evDesc"></small></div><div class="evbar"><i id="evBar"></i></div></div>
 
-  <div class="sect">
+  <div class="sect" id="custSect">
     <h2>الكليان 🧍 (كليكي على الكليان باش تعطيه الماكلة)</h2>
     <div id="decorRow" class="hidden"></div>
     <div id="customers"></div>
   </div>
 
-  <div class="sect">
+  <div class="sect" id="kitSect">
     <h2>الكوزينة 🔥 (<span data-g="حط|حطي">حط</span> العناصر فالطبلة، ومن بعد كليكي على الكانون)</h2>
     <div id="kitchen">
       <div class="board">
@@ -446,7 +522,7 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
     <div id="ings"></div>
   </div>
 
-  <div class="sect">
+  <div class="sect" id="bookSect">
     <h2 id="bookTitle">منيو المطعم 📖</h2>
     <div id="book"></div>
   </div>
@@ -660,6 +736,7 @@ button,.cust,.stove,.ing,#boardItems span{touch-action:manipulation}
 
 <div id="toast"></div>
 <button id="setBtn" title="الإعدادات">⚙️</button>
+<button id="bookBtn" title="المنيو">📖</button>
 <div id="setScr" class="hidden">
   <div class="panel">
     <div class="big">⚙️</div>
@@ -1452,7 +1529,7 @@ function renderAll(){renderStats();renderBoard();renderHand();renderCustomers(tr
 function renderStats(){
   const net=S.money-S.cost, tg=target(), bar=$('#goalBar');
   $('#chefTitle').textContent=`${G.avatar} ${chefName()}`;
-  $('#city').textContent=REGIONS[G.cur].city;$('#day').textContent='النهار '+(G.rdays[G.cur]+1);
+  $('#city').textContent=REGIONS[G.cur].city;$('#day').innerHTML='<span class="dl">النهار </span>'+(G.rdays[G.cur]+1);
   $('#money').textContent=net;$('#target').textContent=tg;$('#bank').textContent=G.bank;
   bar.style.width=Math.max(0,Math.min(100,net/tg*100))+'%';bar.classList.toggle('done',net>=tg);
   $('#hearts').textContent='❤️'.repeat(Math.max(0,S.hearts))+'🖤'.repeat(3-Math.max(0,S.hearts));
@@ -1477,7 +1554,7 @@ function renderCustomers(full){
       if(c){
         const r=R[c.dish];
         d.innerHTML=`${c.vip?'<div class="vipb">👑 VIP</div>':''}<div class="face">${c.face}</div><div class="name">${c.name}</div>
-          <div class="bubble">${c.line}<span class="dish">${r.icon}</span>${r.name}${c.suf}</div>
+          <div class="bubble"><span class="ln">${c.line}</span><span class="dish">${r.icon}</span>${r.name}${c.suf}</div>
           <div class="hint" title="الإرشاد">💡 ${r.ing.map(i=>ING[i][0]).join('')}</div>
           <div class="nos">❌ تقاضات السلعة<br>${g('كليكي','كليكي')} باش تلغي</div>
           <div class="pat"><i></i></div>`;
@@ -1894,6 +1971,9 @@ document.querySelectorAll('.setrow[data-k]').forEach(r=>{
 });
 $('#setBtn').addEventListener('click',e=>{e.stopPropagation();initAudio();openSettings()});
 $('#setClose').onclick=closeSettings;
+// phone: the recipe book opens as a sheet instead of taking room under the kitchen
+$('#bookBtn').addEventListener('click',e=>{e.stopPropagation();document.body.classList.toggle('showbook')});
+$('#bookSect').addEventListener('click',()=>document.body.classList.remove('showbook'));
 $('#setQuit').onclick=()=>{setWasRunning=false;$('#setScr').classList.add('hidden');stopVoices();showMenu()};
 applyVolumes();
 G={name:'',gender:'f',avatar:'👩‍🍳',owned:1,cur:0,bank:0,days:0,rdays:REGIONS.map(()=>0),seen:[]};
