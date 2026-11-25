@@ -188,6 +188,7 @@ header h1{margin:0;font-size:20px;font-weight:900}
 .rst{font-family:inherit;font-weight:700;font-size:13px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 4px;cursor:pointer}
 .rst.on{border-color:var(--teal);background:#e3f4f5;color:var(--teal);box-shadow:0 0 0 2px rgba(42,140,150,.25)}
 .rst:active{transform:translateY(1px)}
+.rst.wide{grid-column:1/-1}
 #radioList .rgrp{grid-column:1/-1;font-weight:900;font-size:13px;color:var(--teal);margin-top:4px}
 #radioStat{grid-column:1/-1;font-size:13px;font-weight:700;color:var(--muted)}
 
@@ -894,73 +895,109 @@ const AUD={master:null,music:null,musicBus:null,sfxBus:null,amb:null,ambDry:null
 try{const v=JSON.parse(localStorage.getItem('matbakh2_vol'));if(v)AUD.vol=v}catch(e){}
 const volOf=k=>AUD.vol[k].on?AUD.vol[k].v:0;
 
-/* ---- radio: real Moroccan stations, for players who'd rather hear the radio than the game music ---- */
-// [id, label, stream] — all https, checked to play in the browser
+/* ---- radio: the real Moroccan stations, for players who'd rather hear the radio than the game music ---- */
+// [id, label, group, kind, src]
+//  kind 'mp3' = plain stream; 'hls' = plain HLS playlist (hls.js, or native on iPhone); 'eb' = easybroadcast HLS (SNRT, Medi1): needs a fresh public token + hls.js
+const RGROUPS=[['news','📰 الأخبار والمجتمع'],['sport','⚽ الرياضة'],['music','🎵 الموسيقى والترفيه'],['nat','🕌 الدينية والوطنية']];
 const STATIONS=[
-  ['medina','📻 ميدينا FM','https://medinafm.ice.infomaniak.ch/medinafm-128.mp3'],
-  ['hit','🎧 هيت راديو','https://hitradio-maroc.ice.infomaniak.ch/hitradio-maroc-128.mp3'],
-  ['mars','⚽ راديو مارس','https://radiomars.ice.infomaniak.ch/radiomars-128.mp3'],
-  ['aswat','🎙️ أصوات','https://broadcast.ice.infomaniak.ch/aswat-high.mp3'],
-  ['m1hits','🎶 ميدي 1 هيتس','https://cdn.live.easybroadcast.io/medi1radio/Hits'],
-  ['m1tarab','🎻 ميدي 1 طرب','https://cdn.live.easybroadcast.io/medi1radio/Tarab'],
-  ['chaabi','🥁 الشعبي','https://radio.yabiladi.com:8102/;stream.mp3'],
-  ['tarab','🎼 ميدينا طرب','https://medinatarab.ice.infomaniak.ch/medinatarab-128.mp3'],
-  ['nostalgie','📼 ميدينا نوسطالجي','https://medinanachat.ice.infomaniak.ch/medinanachat-128.mp3'],
-  ['andalou','🕌 ميدينا أندلسي','https://medinaandalou.ice.infomaniak.ch/medinaandalou-128.mp3'],
-  ['amazigh','🏔️ ميدينا أمازيغ','https://medinaamazigh.ice.infomaniak.ch/medinaamazigh-128.mp3'],
-  ['agadir','🌅 راديو بلوس أكادير','https://stream-158.zeno.fm/bqdbb6hd0neuv'],
-  ['marrakech','🌴 مراكش بلوس','https://cast5.my-control-panel.com/proxy/marrakec/stream'],
-  ['skyrock','🎤 سكايروك كازا','https://icecast.skyrock.net/s/casa_aac_64k'],
-  // islamic group (4th field 'isl'): Quran in warsh (the Moroccan reading) first
-  ['qazabri','📖 القزابري (ورش)','https://serverkw.quran-uni.com:8212/;','isl'],
-  ['kouchi','📖 العيون الكوشي (ورش)','https://serverkw.quran-uni.com:8164/;','isl'],
-  ['basitw','📖 عبد الباسط (ورش)','https://serverkw.quran-uni.com:8210/;','isl'],
-  ['husary','📖 الحصري','https://qurango.net/radio/mahmoud_khalil_alhussary','isl'],
-  ['minshawi','📖 المنشاوي','https://radio.mp3islam.com/listen/minshawi/radio.mp3','isl'],
-  ['mishary','📖 مشاري العفاسي','https://radio.mp3islam.com/listen/mishary/radio.mp3','isl'],
-  ['sudais','📖 السديس','https://radio.mp3islam.com/listen/sudais/radio.mp3','isl'],
-  ['qcairo','🕌 إذاعة القرآن الكريم','https://radio.xecod.com/station/quran-cairo','isl'],
-  ['qsharjah','🕌 إذاعة القرآن (الشارقة)','https://l3.itworkscdn.net/smcquranlive/quranradiolive/icecast.audio','isl'],
-  ['tafsir','📚 التفسير','https://qurango.net/radio/tafseer','isl'],
+  ['medi1','📻 ميدي 1','news','eb','83_medi1radio-maghreb_8s9i4bn'],
+  ['aswat','🎙️ أصوات','news','mp3','https://broadcast.ice.infomaniak.ch/aswat-high.mp3'],
+  ['medradio','📡 ميد راديو','news','mp3','https://medradio.ice.infomaniak.ch/medradio-128.mp3'],
+  ['mfm','📻 راديو MFM','news','mp3','https://a5.asurahosting.com:7980/radio.mp3'],
+  ['mars','⚽ راديو مارس','sport','mp3','https://radiomars.ice.infomaniak.ch/radiomars-128.mp3'],
+  ['hit','🎧 هيت راديو','music','mp3','https://hitradio-maroc.ice.infomaniak.ch/hitradio-maroc-128.mp3'],
+  ['chada','🎶 شدى إف إم','music','hls','https://stream.bodkas.com/playlist?id=chadafmradio'],
+  ['medVI','📖 إذاعة محمد السادس للقرآن الكريم','nat','eb','radio_med_VI'],
+  ['nationale','🇲🇦 الإذاعة الوطنية','nat','eb','radio_nationale'],
+  ['amazighia','ⵣ الإذاعة الأمازيغية','nat','eb','radio_amazigh'],
 ];
-const RADIO={id:null,v:.8,last:'medina',want:false,el:null,ducked:false,stat:'',retry:0};
-try{const r=JSON.parse(localStorage.getItem('matbakh_radio'));if(r){RADIO.v=r.v??.8;RADIO.last=r.last||'medina';RADIO.want=!!r.on}}catch(e){}
+const RADIO={id:null,v:.8,last:'medi1',want:false,el:null,hls:null,ducked:false,stat:'',retry:0,seq:0,tok:{},pre:false};
+try{const r=JSON.parse(localStorage.getItem('matbakh_radio'));if(r){RADIO.v=r.v??.8;RADIO.last=r.last;RADIO.want=!!r.on}}catch(e){}
 const stOf=id=>STATIONS.find(s=>s[0]===id)||STATIONS[0];
+if(!STATIONS.some(s=>s[0]===RADIO.last))RADIO.last='medi1';   // saved station from an older list
 function saveRadio(){try{localStorage.setItem('matbakh_radio',JSON.stringify({v:RADIO.v,last:RADIO.last,on:!!RADIO.id}))}catch(e){}}
 function radioVol(){if(RADIO.el)RADIO.el.volume=RADIO.v*(RADIO.ducked?.35:1)}   // quieter while a customer talks
 function radioStatus(t){RADIO.stat=t;const e=$('#radioStat');if(e&&RADIO.id)e.textContent=t}
-function playRadio(id){
-  const st=stOf(id);
+function radioFail(){
+  if(!RADIO.id)return;
+  // a dropped stream (or an expired token) gets a quiet retry before telling the player
+  if(RADIO.retry++<2){radioStatus('⏳ كنعاود نتاصل…');const id=RADIO.id;setTimeout(()=>RADIO.id===id&&playRadio(id),2000);return}
+  radioStatus('❌ هاد الإذاعة ما خدماتش دابا، ختار وحدة خرا');
+}
+// tokens last about an hour; they're fetched ahead (when the settings open) so a tap can start the stream at once —
+// iPhones only allow sound that starts inside the tap itself
+const cachedTok=p=>{const c=RADIO.tok[p];return c&&c.exp>Date.now()/1000+120?c.t:null};
+async function getTok(p){
+  const c=cachedTok(p);if(c)return c;
+  const t=await fetch('https://token.easybroadcast.io/all?url='+encodeURIComponent('https://cdn.live.easybroadcast.io/live/'+p+'/playlist.m3u8')).then(r=>r.text());
+  const m=t.match(/expires=(\d+)/);RADIO.tok[p]={t,exp:m?+m[1]:0};return t;
+}
+function prefetchRadio(){if(RADIO.pre)return;RADIO.pre=true;loadHls().catch(()=>{});STATIONS.filter(s=>s[3]==='eb').forEach(s=>getTok(s[4]).catch(()=>{}))}
+let hlsLoading=null;
+function loadHls(){
+  if(window.Hls)return Promise.resolve();
+  return hlsLoading||(hlsLoading=new Promise((res,rej)=>{const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.17/hls.min.js';s.onload=res;s.onerror=()=>{hlsLoading=null;rej()};document.head.appendChild(s)}));
+}
+function radioReset(){
+  if(RADIO.hls){RADIO.hls.destroy();RADIO.hls=null}
+  if(RADIO.el){RADIO.el.pause();RADIO.el.removeAttribute('src');RADIO.el.load()}
+}
+async function playRadio(id){
+  const st=stOf(id),seq=++RADIO.seq;
   if(!RADIO.el){
     const a=RADIO.el=new Audio();a.preload='none';
     a.addEventListener('playing',()=>{RADIO.retry=0;radioStatus('🔴 مباشر: '+stOf(RADIO.id)[1])});
     a.addEventListener('waiting',()=>radioStatus('⏳ كيتشارجا…'));
-    a.addEventListener('error',()=>{
-      if(!RADIO.id)return;
-      // a dropped stream gets one quiet retry before telling the player
-      if(RADIO.retry++<1){radioStatus('⏳ كنعاود نتاصل…');setTimeout(()=>RADIO.id&&playRadio(RADIO.id),2000);return}
-      radioStatus('❌ هاد الإذاعة ما خدماتش دابا، ختار وحدة خرا');
-    });
+    a.addEventListener('error',()=>{if(!RADIO.hls)radioFail()});
   }
   if(RADIO.id!==st[0])RADIO.retry=0;
-  RADIO.id=RADIO.last=st[0];RADIO.el.src=st[2];radioVol();
+  RADIO.id=RADIO.last=st[0];
+  radioReset();radioVol();
   radioStatus('⏳ كيتشارجا '+st[1]+'…');
-  RADIO.el.play().catch(e=>{if(e.name==='NotAllowedError')radioStatus('👆 كليكي على الإذاعة باش تبدا')});
   saveRadio();applyVolumes();renderRadio();
+  const a=RADIO.el;
+  // play() has to start inside the tap, so it's called right away and the stream source is filled in after
+  const go=()=>a.play().catch(e=>{if(e.name==='NotAllowedError')radioStatus('👆 كليكي على الإذاعة باش تبدا')});
+  if(st[3]==='mp3'){a.src=st[4];go();return}
+  if(st[3]==='hls'){
+    if(!window.Hls){await loadHls().catch(()=>{});if(seq!==RADIO.seq)return}
+    if(window.Hls&&Hls.isSupported()){
+      const h=RADIO.hls=new Hls();
+      h.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal&&RADIO.hls===h){h.destroy();RADIO.hls=null;radioFail()}});
+      h.loadSource(st[4]);h.attachMedia(a);
+    }else a.src=st[4];
+    go();return;
+  }
+  try{
+    const base='https://cdn.live.easybroadcast.io/live/'+st[4]+'/';
+    let tok=cachedTok(st[4]);
+    if(!tok||!window.Hls){
+      [tok]=await Promise.all([getTok(st[4]),loadHls().catch(()=>{})]);
+      if(seq!==RADIO.seq)return;   // the player picked another station meanwhile
+    }
+    if(window.Hls&&Hls.isSupported()){
+      // the token has to ride on every playlist request, also the inner chunks list
+      const h=RADIO.hls=new Hls({xhrSetup:(x,url)=>{if(!/token=/.test(url))x.open('GET',url+(url.includes('?')?'&':'?')+tok,true)}});
+      h.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal&&RADIO.hls===h){h.destroy();RADIO.hls=null;radioFail()}});
+      h.loadSource(base+'playlist.m3u8');h.attachMedia(a);
+    }else a.src=base+'chunks.m3u8?'+tok;   // iPhone: native HLS
+    go();
+  }catch(e){if(seq===RADIO.seq)radioFail()}
 }
 function stopRadio(){
-  RADIO.id=null;
-  if(RADIO.el){RADIO.el.pause();RADIO.el.removeAttribute('src');RADIO.el.load()}
+  RADIO.id=null;RADIO.seq++;
+  radioReset();
   saveRadio();applyVolumes();renderRadio();
 }
 function renderRadio(){
   const r=$('#radioRow');if(!r)return;const on=!!RADIO.id;
+  prefetchRadio();
   r.classList.toggle('off',!on);
   const b=r.querySelector('.tog');b.textContent=on?'✅ مشعول':'❌ مطفي';b.classList.toggle('off',!on);
   r.querySelector('input').value=RADIO.v;
-  const btn=s=>`<button class="rst${s[0]===RADIO.id?' on':''}" data-id="${s[0]}">${s[1]}</button>`;
-  $('#radioList').innerHTML='<div class="rgrp">🎵 إذاعات مغربية</div>'+STATIONS.filter(s=>!s[3]).map(btn).join('')
-    +'<div class="rgrp">🕌 إسلامي</div>'+STATIONS.filter(s=>s[3]==='isl').map(btn).join('');
+  const btn=s=>`<button class="rst${s[0]===RADIO.id?' on':''}${s[1].length>18?' wide':''}" data-id="${s[0]}">${s[1]}</button>`;
+  $('#radioList').innerHTML=RGROUPS.map(([g,n])=>`<div class="rgrp">${n}</div>`+STATIONS.filter(s=>s[2]===g).map(btn).join('')).join('');
   $('#radioStat').textContent=on?RADIO.stat:'ختار إذاعة مغربية وسمع ليها وانت كتطيب 🎧';
   const np=$('#nowPlaying');
   if(np&&!$('#setScr').classList.contains('hidden'))np.textContent=on?'📻 كتسمع دابا: '+stOf(RADIO.id)[1]+' (الموسيقى ديال اللعبة واقفة)':'🎵 الموسيقى دابا: '+(STYLES[MUS.styleId]||STYLES.menu).name;
